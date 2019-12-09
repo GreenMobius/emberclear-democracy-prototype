@@ -73,7 +73,7 @@ let Democracy = {
     	var state = copyState(prevState);
     	state.remain = state.remain.filter(state.remain.indexOf(uid));
     	if(vote) {
-			state.yea.push(uid);
+		state.yea.push(uid);
     	} else {
     		state.nay.push(uid);
     	}
