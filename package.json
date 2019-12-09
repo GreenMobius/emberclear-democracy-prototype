@@ -1,0 +1,8 @@
+{
+    "name": "democracy-bot",
+    "version": "1.0.0",
+    "description": "emberclear democracy prototype",
+    "main": "server.js",
+    "author": "emberclear.io",
+    "dependencies": {}
+}

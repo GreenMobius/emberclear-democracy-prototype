@@ -1,3 +1,4 @@
 {
-	token: ${{ secrets.DISCORD_TOKEN }}
+	"prefix": "?",
+	"token": "TOKEN_PLACEHOLDER"
 }
