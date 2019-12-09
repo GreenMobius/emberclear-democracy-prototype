@@ -13,18 +13,26 @@ let Democracy = {
 	}
 	*/
 
+	// initiate vote for adding a user
+	// uid: user id, chid: channel id
     addUser: function (uid, chid) {
         var state = makeEmptyState(uid, chid, "add");
     },
     
+    // initiate vote for removing a user
+    // uid: user id, chid: channel id
     removeUser: function (uid, chid) {
         var state = makeEmptyState(uid, chid, "remove");
     },
     
+    // initiate vote for promoting a user
+    // uid: user id, chid: channel id
     promoteUser: function (uid, chid) {
         var state = makeEmptyState(uid, chid, "promote");
     },
 
+	// returns an empty vote state
+    // uid: user id, chid: channel id, action: <"add"|"remove"|"promote">
     makeEmptyState: function (uid, chid, action) {
     	return {
     		"chid" : chid,
@@ -38,6 +46,8 @@ let Democracy = {
     	}
     },
 
+    // returns a (hopefully deep) clone of the given state
+    // state: state object
     copyState: function (state) {
     	return {
     		"chid" : state.chid,
@@ -51,6 +61,8 @@ let Democracy = {
     	}
     },
 
+    // creates a new state with the uid's vote
+    // uid: user id, prevState: state object, vote: boolean
     vote: function (uid, prevState, vote) {
     	// TODO: implement hashing previous state
     	// TODO: encrypt message with user's private key
@@ -60,7 +72,11 @@ let Democracy = {
     	}
     	var state = copyState(prevState);
     	state.remain = state.remain.filter(state.remain.indexOf(uid));
-    	state.yea.push(uid);
+    	if(vote) {
+			state.yea.push(uid);
+    	} else {
+    		state.nay.push(uid);
+    	}
     	return state;
     }
 }
