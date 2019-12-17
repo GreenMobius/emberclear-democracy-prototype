@@ -90,7 +90,7 @@ let ContextManager = {
 	determine_channel_context: function(channel_uid){
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		var decidedUponContext = {
-			"admin": []
+			"admin": [],
 			"members": []
 		}
 		if(channelContext !== undefined){
@@ -148,7 +148,7 @@ let ContextManager = {
 				"members": finalMembers
 			}
 		}
-	}
+	},
 
 	sync_user_contexts: function(){
 		contexts.forEach((context) => {
