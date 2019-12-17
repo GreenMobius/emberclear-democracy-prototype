@@ -13,9 +13,16 @@ let Democracy = {
 	}
 	*/
 
+    voteInProgress: false,
+
 	// initiate vote for adding a user
 	// uid: user id, chid: channel id
     addUser: function (uid, chid) {
+        if(voteInProgress) {
+            return {
+                "error": "Vote already in progress"
+            }
+        }
         var state = makeEmptyState(uid, chid, "add");
         return vote(uid, state, true);
     },
@@ -23,6 +30,11 @@ let Democracy = {
     // initiate vote for removing a user
     // uid: user id, chid: channel id
     removeUser: function (uid, chid) {
+        if(voteInProgress) {
+            return {
+                "error": "Vote already in progress"
+            }
+        }
         var state = makeEmptyState(uid, chid, "remove");
         return vote(uid, state, true);
     },
@@ -30,6 +42,11 @@ let Democracy = {
     // initiate vote for promoting a user
     // uid: user id, chid: channel id
     promoteUser: function (uid, chid) {
+        if(voteInProgress) {
+            return {
+                "error": "Vote already in progress"
+            }
+        }
         var state = makeEmptyState(uid, chid, "promote");
         return vote(uid, state, true);
     },
@@ -45,7 +62,8 @@ let Democracy = {
     		"nay" : [],
     		"remain" : [], // TODO: all users in channel
     		"time" : new Date(),
-    		"previous" : null
+    		"previous" : null,
+            "error" : null
     	}
     },
 
@@ -60,7 +78,8 @@ let Democracy = {
     		"nay" : state.nay,
     		"remain" : state.remain,
     		"time" : new Date(),
-    		"previous" : state
+    		"previous" : state,
+            "error" : null
     	}
     },
 
@@ -71,7 +90,9 @@ let Democracy = {
     	// TODO: encrypt message with user's private key
     	// TODO: add validation logic for previous states
     	if(!prevState.remain.includes(uid)) {
-    		return null;
+    		return {
+                "error": "Vote is invalid"
+            }
     	}
     	var state = copyState(prevState);
     	state.remain = state.remain.filter(state.remain.indexOf(uid));
