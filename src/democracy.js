@@ -38,7 +38,6 @@ let Democracy = {
     // uid: user id, chid: channel id, action: <"add"|"remove"|"promote">
     makeEmptyState: function (uid, chid, action) {
     	return {
-            "id" : 1 + (new Date()),
     		"chid" : chid,
     		"action" : action,
     		"uid" : uid,
@@ -54,7 +53,6 @@ let Democracy = {
     // state: state object
     copyState: function (state) {
     	return {
-            "id" : 1 + (new Date()),
     		"chid" : state.chid,
     		"action" : state.action,
     		"uid" : state.uid,
