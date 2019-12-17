@@ -1,17 +1,17 @@
 let TaskRunner = {
-    addUser: function (message, channel) {
-        let role = message.guild.roles.find(role => role.name === channel);
+    addUser: function (message) {
+        let role = message.guild.roles.find(role => role.name === message.channel);
         message.member.addRole(role);
     },
     
-    removeUser: function (message, channel) {
-        let role = message.guild.roles.find(role => role.name === channel);
+    removeUser: function (message) {
+        let role = message.guild.roles.find(role => role.name === message.channel);
         message.member.removeRole(role);
     },
     
-    promoteUser: function (message, channel) {
+    promoteUser: function (message) {
         // TODO agree on how to represent admin of channel
-        let role = message.guild.roles.find(role => role.name === "${channel}-admin");
+        let role = message.guild.roles.find(role => role.name === `${message.channel}-admin`);
         message.member.addRole(role);
     },
 }
