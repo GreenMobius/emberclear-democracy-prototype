@@ -16,4 +16,4 @@ let TaskRunner = {
     },
 }
 
-export default TaskRunner;
+ module.exports = TaskRunner;

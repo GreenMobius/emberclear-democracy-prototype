@@ -84,4 +84,4 @@ let Democracy = {
     }
 }
 
-export default Democracy;
+module.exports = Democracy;

@@ -1,4 +1,5 @@
 const config = require("../config.json");
+const tr = require("./task-runner");
 
 function messageHandler(message){
 	if(message.author.bot) return;
@@ -6,6 +7,7 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
+	const channel = message.channel;
 
 	// TODO: remove after democracy commands are implemented
 	if (command === "test") {
@@ -14,9 +16,16 @@ function messageHandler(message){
 	
 	if (command === "remove-member") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if(!member)
-		  return message.reply("Please mention a valid member of this server");
-			// TODO: call democracy function
+		if(!member) {
+			return message.reply("Please mention a valid member of this server");
+		}
+		
+		// TODO: call democracy function
+		let votePassed = true;
+
+		if (votePassed) {
+			tr.removeUser(message, channel);
+		}
 	}	
 
 	if (command === "add-member") {
