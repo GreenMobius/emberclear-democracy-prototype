@@ -160,4 +160,4 @@ let ContextManager = {
 	}
 }
 
-export default ContextManager
+export default ContextManager;
