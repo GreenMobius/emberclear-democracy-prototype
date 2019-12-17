@@ -70,6 +70,17 @@ let ContextManager = {
 		}
 	},
 
+	get_users_user_context: function(channel_uid, user_uid){
+		var channelContext = contexts.find((context) => context.channel === channel_uid)
+		if(channelContext !== undefined){
+			var userContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid)
+			if(userContext !== undefined && user_context.admin !== undefined && Array.isArray(user_context.members)){
+				return userContext
+			}
+		}
+		return undefined
+	},
+
 	determine_if_user_is_in_channel: function(channel_uid, user_uid){
 		var countFor = 0
 		var countAgainst = 0
