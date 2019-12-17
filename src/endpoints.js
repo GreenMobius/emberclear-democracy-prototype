@@ -28,6 +28,12 @@ function messageHandler(message){
 	if (command === "change-admin") {
 		return message.reply(Democracy.changeAdmin(member, channel));
 	}
+
+	if (command === "vote") {
+		// invoke democracy vote
+		// if pass, execute command
+		// if fail, announce fail
+	}
 }
 
 module.exports.handleMessage = messageHandler;
