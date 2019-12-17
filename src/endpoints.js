@@ -11,20 +11,22 @@ function messageHandler(message){
 	if (command === "test") {
 		return message.reply("Status: OK");
 	}
+
+	let member = message.mentions.members.first() || message.guild.members.get(args[0]);
+	if(!member)
+	  return message.reply("Please mention a valid member of this server");
+	let channel = message.channel;
 	
 	if (command === "remove-member") {
-		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if(!member)
-		  return message.reply("Please mention a valid member of this server");
-			// TODO: call democracy function
+		return message.reply(Democracy.removeUser(member, channel));
 	}	
 
 	if (command === "add-member") {
-		// TODO: call democracy function
+		return message.reply(Democracy.add(member, channel));
 	}
 
 	if (command === "change-admin") {
-		// TODO: call democracy function
+		return message.reply(Democracy.changeAdmin(member, channel));
 	}
 }
 

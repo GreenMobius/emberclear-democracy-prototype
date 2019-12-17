@@ -17,18 +17,21 @@ let Democracy = {
 	// uid: user id, chid: channel id
     addUser: function (uid, chid) {
         var state = makeEmptyState(uid, chid, "add");
+        return vote(uid, state, true);
     },
     
     // initiate vote for removing a user
     // uid: user id, chid: channel id
     removeUser: function (uid, chid) {
         var state = makeEmptyState(uid, chid, "remove");
+        return vote(uid, state, true);
     },
     
     // initiate vote for promoting a user
     // uid: user id, chid: channel id
     promoteUser: function (uid, chid) {
         var state = makeEmptyState(uid, chid, "promote");
+        return vote(uid, state, true);
     },
 
 	// returns an empty vote state
