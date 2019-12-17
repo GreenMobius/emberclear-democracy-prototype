@@ -1,5 +1,6 @@
 const config = require("../config.json");
 const tr = require("./task-runner");
+const democracy = require("./democracy");
 
 function messageHandler(message){
 	if(message.author.bot) return;
@@ -7,9 +8,9 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
-	const channel = message.channel;
+	const uid = message.user.id;
+	const channel = message.channel.name;
 
-	// TODO: remove after democracy commands are implemented
 	if (command === "test") {
 		return message.reply("Status: OK");
 	}
@@ -20,20 +21,27 @@ function messageHandler(message){
 			return message.reply("Please mention a valid member of this server");
 		}
 		
-		// TODO: call democracy function
-		let votePassed = true;
+		let votePassed = democracy.removeUser(uid, channel);
 
 		if (votePassed) {
-			tr.removeUser(message, channel);
+			tr.removeUser(message);
 		}
 	}	
 
 	if (command === "add-member") {
-		// TODO: call democracy function
+		let votePassed = democracy.addUser(uid, channel);
+
+		if (votePassed) {
+			tr.addUser(message);
+		}
 	}
 
 	if (command === "change-admin") {
-		// TODO: call democracy function
+		let votePassed = democracy.promoteUser(uid, channel);
+
+		if (votePassed) {
+			tr.changeAdmin(message);
+		}
 	}
 }
 
