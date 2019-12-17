@@ -16,12 +16,12 @@ let TaskRunner = {
     changeAdmin: function (message) {
         // TODO agree on how to represent admin of channel
         const adminRoleString = `${message.channel.name}-admin`;
-        const role = message.guild.roles.array.filter(role => role.name === adminRoleString);
+        const adminRole = message.guild.roles.array.filter(role => role.name === adminRoleString);
 
         const guild = client.guilds.array.filter(guild => guild.id === config.guildId)[0];
         const currentAdmin = guild.members.array.filter(member => member.roles.array.includes(adminRole))[0];
-        currentAdmin.removeRole(role);
-        message.member.addRole(role);
+        currentAdmin.removeRole(adminRole);
+        message.member.addRole(adminRole);
     },
 }
 
