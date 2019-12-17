@@ -37,7 +37,12 @@ function messageHandler(message){
 	}
 
 	if (command === "change-user-context-add-member") {
-		// TODO: call context manager
+		let member = message.mentions.members.first()
+		let currentUserContext = contextManager.get_users_user_context(message.guild.id, author.id)
+		if(currentUserContext.members.find(member.id) === undefined){
+			currentUserContext.members.push(member.id)
+		}
+		contextManager.change_users_user_context(message.guild.id, author.id, currentUserContext)
 	}
 
 	if (command === "change-user-context-remove-member") {
