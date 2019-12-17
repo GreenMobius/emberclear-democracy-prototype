@@ -32,6 +32,7 @@ let ContextManager = {
 				"user_context": determine_channel_context()
 			})
 		}
+		sync_user_contexts()
 	},
 
 	delete_user: function(channel_uid, user_uid){
@@ -48,6 +49,7 @@ let ContextManager = {
 				})
 			}
 		}
+		sync_user_contexts()
 	},
 
 	change_admin: function(channel_uid, user_uid){
@@ -55,6 +57,7 @@ let ContextManager = {
 		if(channelContext !== undefined && determine_if_user_is_in_channel(channel_uid, user_uid)){
 			channelContext.user_contexts.forEach((userContext) => userContext.user_context.admin = user_uid)
 		}
+		sync_user_contexts()
 	},
 
 	change_users_user_context: function(channel_uid, user_uid, user_context){
@@ -145,6 +148,15 @@ let ContextManager = {
 				"members": finalMembers
 			}
 		}
+	}
+
+	sync_user_contexts: function(){
+		contexts.forEach((context) => {
+			var decidedUponContext = determine_channel_context(context.channel)
+			context.user_contexts.forEach((userContext) => {
+				userContext.user_context = decidedUponContext
+			})
+		})
 	}
 }
 
