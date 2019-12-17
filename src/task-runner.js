@@ -3,17 +3,17 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 let TaskRunner = {
-    addUser: function (message) {
+    addUser: function(message) {
         let role = message.guild.roles.find(role => role.name === message.channel.name);
         message.member.addRole(role);
     },
     
-    removeUser: function (message) {
+    removeUser: function(message) {
         let role = message.guild.roles.find(role => role.name === message.channel.name);
         message.member.removeRole(role);
     },
     
-    changeAdmin: function (message) {
+    changeAdmin: function(message) {
         // TODO agree on how to represent admin of channel
         const adminRoleString = `${message.channel.name}-admin`;
         const adminRole = message.guild.roles.array.filter(role => role.name === adminRoleString);
