@@ -19,23 +19,41 @@ let ContextManager = {
 		}	
 	},
 
-	add_user: function(channel_uid, user_uid){
+	add_user: function(channel_uid, user_uid, author_uid){
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
-		if(channelContext !== undefined && channelContext.user_contexts.every((userContext) => userContext.user !== user_uid)){
-			channelContext.user_contexts.forEach((userContext) => {
-				if(userContext.user_context.members.find(user_uid) === undefined){
-					userContext.user_context.members.push(user_uid)
-				}				
-			})
-			channelContext.user_contexts.push({
-				"user": user_uid,
-				"user_context": determine_channel_context()
-			})
+		// if(channelContext !== undefined && channelContext.user_contexts.every((userContext) => userContext.user !== user_uid)){
+		// 	channelContext.user_contexts.forEach((userContext) => {
+		// 		if(userContext.user_context.members.find(user_uid) === undefined){
+		// 			userContext.user_context.members.push(user_uid)
+		// 		}				
+		// 	})
+		// 	channelContext.user_contexts.push({
+		// 		"user": user_uid,
+		// 		"user_context": determine_channel_context()
+		// 	})
+		// }
+		// sync_user_contexts()
+
+		if(channelContext !== undefined){
+			var authorContext = channelContext.find((userContext) => userContext.user = author_uid)
+			if(authorContext !== undefined){
+				if(authorContext.user_context.members.find(user_uid) === undefined){
+					authorContext.user_context.members.push(user_uid)
+				}
+				channelContext.forEach((userContext) => {
+					var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
+					var membersDiff = user_context.user_context.members
+						.filter(member => !authorContext.user_context.members.includes(member))
+						.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
+					if(isAdminMatch && membersDiff.length === 1 && membersDiff[0] === user_uid && authorContext.user_context.members.includes(user_uid)){
+						userContext.user_context = authorContext.user_context
+					}
+				})
+			}
 		}
-		sync_user_contexts()
 	},
 
-	delete_user: function(channel_uid, user_uid){
+	delete_user: function(channel_uid, user_uid, author_uid){
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
 			var index = channelContext.user_contexts.findIndex((userContext) => userContext.user === user_uid)
@@ -52,7 +70,7 @@ let ContextManager = {
 		sync_user_contexts()
 	},
 
-	change_admin: function(channel_uid, user_uid){
+	change_admin: function(channel_uid, user_uid, author_uid){
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined && determine_if_user_is_in_channel(channel_uid, user_uid)){
 			channelContext.user_contexts.forEach((userContext) => userContext.user_context.admin = user_uid)
