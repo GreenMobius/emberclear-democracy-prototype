@@ -97,10 +97,31 @@ let ContextManager = {
 
 	change_admin: function(channel_uid, user_uid, author_uid){
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
-		if(channelContext !== undefined && determine_if_user_is_in_channel(channel_uid, user_uid)){
-			channelContext.user_contexts.forEach((userContext) => userContext.user_context.admin = user_uid)
+
+		// if(channelContext !== undefined && determine_if_user_is_in_channel(channel_uid, user_uid)){
+		// 	channelContext.user_contexts.forEach((userContext) => userContext.user_context.admin = user_uid)
+		// }
+		// sync_user_contexts()
+
+		if(channelContext !== undefined){
+			var authorContext = channelContext.find((userContext) => userContext.user = author_uid)
+			if(authorContext !== undefined){
+				if(authorContext.user_context.members.includes(user_uid)){
+					authorContext.user_context.admin = user_uid
+				}
+				channelContext.forEach((userContext) => {
+					if(userContext.user !== authorContext.user){
+						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
+						var membersDiff = user_context.user_context.members
+							.filter(member => !authorContext.user_context.members.includes(member))
+							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
+						if(!isAdminMatch && membersDiff.length === 0){
+							userContext.user_context = authorContext.user_context
+						}
+					}
+				})
+			}
 		}
-		sync_user_contexts()
 	},
 
 	change_users_user_context: function(channel_uid, user_uid, user_context){
