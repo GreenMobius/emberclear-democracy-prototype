@@ -15,37 +15,41 @@ let Democracy = {
 
 	// initiate vote for adding a user
 	// uid: user id, chid: channel id
-    addUser: function (uid, chid) {
-        var state = makeEmptyState(uid, chid, "add");
+    addUser: function (uid, channel) {
+        console.log("Voting to add user " + uid + " to channel " + channel.chid + " with members: " + channel.members);
+        var state = makeEmptyState(uid, channel, "add");
         return vote(uid, state, true);
     },
     
     // initiate vote for removing a user
     // uid: user id, chid: channel id
-    removeUser: function (uid, chid) {
-        var state = makeEmptyState(uid, chid, "remove");
+    removeUser: function (uid, channel) {
+        console.log("Voting to remove user " + uid + " from channel " + channel.chid);
+        var state = makeEmptyState(uid, channel, "remove");
         return vote(uid, state, true);
     },
     
     // initiate vote for promoting a user
     // uid: user id, chid: channel id
-    promoteUser: function (uid, chid) {
-        var state = makeEmptyState(uid, chid, "promote");
+    promoteUser: function (uid, channel) {
+        console.log("Voting to promote user " + uid + " in channel " + channel.chid);
+        var state = makeEmptyState(uid, channel, "promote");
         return vote(uid, state, true);
     },
 
 	// returns an empty vote state
     // uid: user id, chid: channel id, action: <"add"|"remove"|"promote">
-    makeEmptyState: function (uid, chid, action) {
+    makeEmptyState: function (uid, channel, action) {
     	return {
-    		"chid" : chid,
+    		"chid" : channel.chid,
     		"action" : action,
     		"uid" : uid,
     		"yea" : [],
     		"nay" : [],
-    		"remain" : [], // TODO: all users in channel
+    		"remain" : channel.members,
     		"time" : new Date(),
-    		"previous" : null
+    		"previous" : null,
+            "error" : null
     	}
     },
 
@@ -60,7 +64,8 @@ let Democracy = {
     		"nay" : state.nay,
     		"remain" : state.remain,
     		"time" : new Date(),
-    		"previous" : state
+    		"previous" : state,
+            "error" : null
     	}
     },
 
@@ -71,17 +76,19 @@ let Democracy = {
     	// TODO: encrypt message with user's private key
     	// TODO: add validation logic for previous states
     	if(!prevState.remain.includes(uid)) {
-    		return null;
+    		return {
+                "error": "Vote is invalid"
+            }
     	}
     	var state = copyState(prevState);
     	state.remain = state.remain.filter(state.remain.indexOf(uid));
     	if(vote) {
-		state.yea.push(uid);
+            state.yea.push(uid);
     	} else {
     		state.nay.push(uid);
     	}
     	return state;
-    }
+    }   
 }
 
-export default Democracy;
+module.exports = Democracy;
