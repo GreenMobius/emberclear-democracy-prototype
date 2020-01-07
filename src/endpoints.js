@@ -19,30 +19,38 @@ function messageHandler(message){
 	
 	if (command === "remove-member") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if(!member) {
+		if (!member) {
 			return message.reply("Please mention a valid member of this server");
 		}
 		
 		let votePassed = democracy.removeUser(uid, channel);
 
 		if (votePassed) {
-			tr.removeUser(message);
+			tr.removeUser(message, member);
 		}
 	}	
 
 	if (command === "add-member") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
+		if (!member) {
+			return message.reply("Please mention a valid member of this server");
+		}
 		let votePassed = democracy.addUser(uid, channel);
 
 		if (votePassed) {
-			tr.addUser(message);
+			tr.addUser(message, member);
 		}
 	}
 
 	if (command === "change-admin") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
+		if (!member) {
+			return message.reply("Please mention a valid member of this server");
+		}
 		let votePassed = democracy.promoteUser(uid, channel);
 
 		if (votePassed) {
-			tr.changeAdmin(message);
+			tr.changeAdmin(message, member);
 		}
 	}
 
