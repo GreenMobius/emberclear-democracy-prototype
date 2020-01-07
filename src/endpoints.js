@@ -1,10 +1,7 @@
 const config = require("../config.json");
-<<<<<<< HEAD
 const tr = require("./task-runner");
 const democracy = require("./democracy");
-=======
 const contextManager = require("./context-manager.js");
->>>>>>> gh-pages
 
 function messageHandler(message){
 	if(message.author.bot) return;
@@ -12,12 +9,9 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
-<<<<<<< HEAD
 	const uid = message.user.id;
 	const channel = message.channel.name;
-=======
 	const author = message.author;
->>>>>>> gh-pages
 
 	if (command === "test") {
 		return message.reply("Status: OK");
