@@ -1,4 +1,5 @@
 const config = require("../config.json");
+const contextManager = require("./context-manager.js");
 
 function messageHandler(message){
 	if(message.author.bot) return;
@@ -6,6 +7,7 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
+	const author = message.author;
 
 	// TODO: remove after democracy commands are implemented
 	if (command === "test") {
@@ -25,6 +27,44 @@ function messageHandler(message){
 
 	if (command === "change-admin") {
 		// TODO: call democracy function
+	}
+
+	if (command === "change-user-context-admin") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		let role = message.guild.roles.find(role => role.name === args[1])
+		if (!role) {
+	    	return console.log("The role does not exist")
+		}
+		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
+		currentUserContext.admin = member.id
+		contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+	}
+
+	if (command === "change-user-context-add-member") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		let role = message.guild.roles.find(role => role.name === args[1])
+		if (!role) {
+	    	return console.log("The role does not exist")
+		}
+		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
+		if(currentUserContext.members.find(member.id) === undefined){
+			currentUserContext.members.push(member.id)
+			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		}		
+	}
+
+	if (command === "change-user-context-remove-member") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		let role = message.guild.roles.find(role => role.name === args[1])
+		if (!role) {
+	    	return console.log("The role does not exist")
+		}
+		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
+		if(currentUserContext.members.find(member.id) !== undefined){
+			var index = currentUserContext.members.findIndex(member.id)
+			currentUserContext.members.splice(index, 1)
+			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		}
 	}
 }
 
