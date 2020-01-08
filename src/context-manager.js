@@ -27,7 +27,7 @@ let ContextManager = {
 				if(authorContext.user_context.members.find(user_uid) === undefined){
 					authorContext.user_context.members.push(user_uid)
 				}
-				channelContext.forEach((userContext) => {
+				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -53,7 +53,7 @@ let ContextManager = {
 						authorContext.user_context.members.splice(userMemberIndex, 1)
 					}
 				}
-				channelContext.forEach((userContext) => {
+				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -76,7 +76,7 @@ let ContextManager = {
 				if(authorContext.user_context.members.includes(user_uid)){
 					authorContext.user_context.admin = user_uid
 				}
-				channelContext.forEach((userContext) => {
+				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -99,6 +99,17 @@ let ContextManager = {
 				userContext.user_context = user_context
 			}
 		}
+	},
+
+	get_relevant_user_contexts: function(channel_uid, author_uid){
+		var channelContext = contexts.find((context) => context.channel === channel_uid)
+		if(channelContext !== undefined){
+			var authorContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === author_uid)
+			if(authorContext !== undefined){
+				return channelContext.user_contexts.filter((userContext) => authorContext.user_context.members.includes(userContext.user))
+			}
+		}
+		return []
 	}
 }
 
