@@ -28,10 +28,16 @@ let ContextManager = {
 					authorContext.user_context.members.push(user_uid)
 					//Need to figure out when to add their context
 					//For now they will just get the author context assuming the vote passes
-					channelContext.user_contexts.push({
-						"user": user_uid,
-						"user_context": authorContext.user_context
-					})
+					var userToAddContext = channelContext.user_contexts.find((userContext) => userContext.user === user_uid)
+					if(userToAddContext !== undefined){
+						userToAddContext.user_context = authorContext.user_context
+					}
+					else{
+						channelContext.user_contexts.push({
+							"user": user_uid,
+							"user_context": authorContext.user_context
+						})
+					}					
 				}
 				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
