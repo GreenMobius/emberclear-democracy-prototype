@@ -1,4 +1,6 @@
 const config = require("../config.json");
+const tr = require("./task-runner");
+const democracy = require("./democracy");
 const contextManager = require("./context-manager.js");
 
 function messageHandler(message){
@@ -7,26 +9,49 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
+	const uid = message.user.id;
+	const channel = message.channel.name;
 	const author = message.author;
 
-	// TODO: remove after democracy commands are implemented
 	if (command === "test") {
 		return message.reply("Status: OK");
 	}
 	
 	if (command === "remove-member") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if(!member)
-		  return message.reply("Please mention a valid member of this server");
-			// TODO: call democracy function
+		if (!member) {
+			return message.reply("Please mention a valid member of this server");
+		}
+		
+		let votePassed = democracy.removeUser(uid, channel);
+
+		if (votePassed) {
+			tr.removeUser(message, member);
+		}
 	}	
 
 	if (command === "add-member") {
-		// TODO: call democracy function
+		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
+		if (!member) {
+			return message.reply("Please mention a valid member of this server");
+		}
+		let votePassed = democracy.addUser(uid, channel);
+
+		if (votePassed) {
+			tr.addUser(message, member);
+		}
 	}
 
 	if (command === "change-admin") {
-		// TODO: call democracy function
+		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
+		if (!member) {
+			return message.reply("Please mention a valid member of this server");
+		}
+		let votePassed = democracy.promoteUser(uid, channel);
+
+		if (votePassed) {
+			tr.changeAdmin(message, member);
+		}
 	}
 
 	if (command === "change-user-context-admin") {

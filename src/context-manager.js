@@ -102,4 +102,4 @@ let ContextManager = {
 	}
 }
 
-export default ContextManager
+module.exports = ContextManager;
