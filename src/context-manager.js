@@ -26,6 +26,7 @@ let ContextManager = {
 			if(authorContext !== undefined){
 				if(authorContext.user_context.members.find(user_uid) === undefined){
 					authorContext.user_context.members.push(user_uid)
+					//Need to figure out when to add their context
 				}
 				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
@@ -51,6 +52,10 @@ let ContextManager = {
 					var userMemberIndex = authorContext.user_context.members.findIndex((member) => member === user_uid)
 					if(userMemberIndex !== -1){
 						authorContext.user_context.members.splice(userMemberIndex, 1)
+					}
+					var userContextIndex = channelContext.user_contexts.findIndex((userContext) => userContext.user === user_uid)
+					if(userContext !== -1){
+						channelContext.user_contexts.splice(userContextIndex, 1)
 					}
 				}
 				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
