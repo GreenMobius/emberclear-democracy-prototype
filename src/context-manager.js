@@ -26,8 +26,18 @@ let ContextManager = {
 			if(authorContext !== undefined){
 				if(authorContext.user_context.members.find(user_uid) === undefined){
 					authorContext.user_context.members.push(user_uid)
+					var userToAddContext = channelContext.user_contexts.find((userContext) => userContext.user === user_uid)
+					if(userToAddContext !== undefined){
+						userToAddContext.user_context = authorContext.user_context
+					}
+					else{
+						channelContext.user_contexts.push({
+							"user": user_uid,
+							"user_context": authorContext.user_context
+						})
+					}					
 				}
-				channelContext.forEach((userContext) => {
+				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -52,8 +62,12 @@ let ContextManager = {
 					if(userMemberIndex !== -1){
 						authorContext.user_context.members.splice(userMemberIndex, 1)
 					}
+					var userContextIndex = channelContext.user_contexts.findIndex((userContext) => userContext.user === user_uid)
+					if(userContext !== -1){
+						channelContext.user_contexts.splice(userContextIndex, 1)
+					}
 				}
-				channelContext.forEach((userContext) => {
+				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -76,7 +90,7 @@ let ContextManager = {
 				if(authorContext.user_context.members.includes(user_uid)){
 					authorContext.user_context.admin = user_uid
 				}
-				channelContext.forEach((userContext) => {
+				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -99,6 +113,17 @@ let ContextManager = {
 				userContext.user_context = user_context
 			}
 		}
+	},
+
+	get_relevant_user_contexts: function(channel_uid, author_uid){
+		var channelContext = contexts.find((context) => context.channel === channel_uid)
+		if(channelContext !== undefined){
+			var authorContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === author_uid)
+			if(authorContext !== undefined){
+				return channelContext.user_contexts.filter((userContext) => authorContext.user_context.members.includes(userContext.user))
+			}
+		}
+		return []
 	}
 }
 
