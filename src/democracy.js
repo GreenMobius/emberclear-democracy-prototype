@@ -14,7 +14,7 @@ let Democracy = {
 	*/
 
 	// initiate vote for adding a user
-	// uid: user id, chid: channel id
+	// uid: user id, channel: channel (chid, members)
     addUser: function (uid, channel) {
         console.log("Voting to add user " + uid + " to channel " + channel.chid + " with members: " + channel.members);
         var state = makeEmptyState(uid, channel, "add");
@@ -22,7 +22,7 @@ let Democracy = {
     },
     
     // initiate vote for removing a user
-    // uid: user id, chid: channel id
+    // uid: user id, channel: channel (chid, members)
     removeUser: function (uid, channel) {
         console.log("Voting to remove user " + uid + " from channel " + channel.chid);
         var state = makeEmptyState(uid, channel, "remove");
@@ -30,7 +30,7 @@ let Democracy = {
     },
     
     // initiate vote for promoting a user
-    // uid: user id, chid: channel id
+    // uid: user id, channel: channel (chid, members)
     promoteUser: function (uid, channel) {
         console.log("Voting to promote user " + uid + " in channel " + channel.chid);
         var state = makeEmptyState(uid, channel, "promote");
@@ -38,7 +38,7 @@ let Democracy = {
     },
 
 	// returns an empty vote state
-    // uid: user id, chid: channel id, action: <"add"|"remove"|"promote">
+    // uid: user id, channel: channel (chid, members), action: <"add"|"remove"|"promote">
     makeEmptyState: function (uid, channel, action) {
     	return {
     		"chid" : channel.chid,
