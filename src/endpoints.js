@@ -9,12 +9,16 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
-	const uid = message.user.id;
+	//const uid = message.user.id;
 	const channel = message.channel.name;
 	const author = message.author;
 
 	if (command === "test") {
 		return message.reply("Status: OK");
+	}
+
+	if (command === "create-channel") {
+		contextManager.add_channel(args[0], author)
 	}
 	
 	if (command === "remove-member") {
