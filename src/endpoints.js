@@ -9,7 +9,7 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
-	//const uid = message.user.id;
+	const uid = message.user.id;
 	const channel = message.channel.name;
 	const author = message.author;
 
@@ -62,7 +62,7 @@ function messageHandler(message){
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return console.log("The role does not exist")
+	    	return message.reply("The role does not exist")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		currentUserContext.admin = member.id
@@ -73,7 +73,7 @@ function messageHandler(message){
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return console.log("The role does not exist")
+	    	return message.reply("The role does not exist")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		if(currentUserContext.members.find(member.id) === undefined){
@@ -86,7 +86,7 @@ function messageHandler(message){
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return console.log("The role does not exist")
+	    	return message.reply("The role does not exist")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		if(currentUserContext.members.find(member.id) !== undefined){
@@ -100,9 +100,9 @@ function messageHandler(message){
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return console.log("The role does not exist")
+	    	return message.reply("The role does not exist")
 		}
-		console.log(contextManager.get_user_context(role.name, author.id))
+		return message.reply(contextManager.get_user_context(role.name, author.id))
 	}
 }
 
