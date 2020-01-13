@@ -9,7 +9,7 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
-	const uid = message.user.id;
+	//const uid = message.user.id;
 	const channel = message.channel.name;
 	const author = message.author;
 
@@ -102,7 +102,7 @@ function messageHandler(message){
 		if (!role) {
 	    	return message.reply("The role does not exist")
 		}
-		return message.reply(contextManager.get_user_context(role.name, author.id))
+		return message.reply(JSON.stringify(contextManager.get_user_context(role.name, author.id), null, 2))
 	}
 }
 
