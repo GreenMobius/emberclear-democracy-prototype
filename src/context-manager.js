@@ -124,6 +124,14 @@ let ContextManager = {
 			}
 		}
 		return []
+	},
+
+	get_user_context: function(channel_uid, user_uid){
+		var channelContext = contexts.find((context) => context.channel === channel_uid)
+		if(channelContext !== undefined){
+			return channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid)
+		}
+		return undefined
 	}
 }
 

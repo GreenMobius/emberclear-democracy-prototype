@@ -60,7 +60,7 @@ function messageHandler(message){
 		if (!role) {
 	    	return console.log("The role does not exist")
 		}
-		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
+		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		currentUserContext.admin = member.id
 		contextManager.change_users_user_context(role.name, author.id, currentUserContext)
 	}
@@ -71,7 +71,7 @@ function messageHandler(message){
 		if (!role) {
 	    	return console.log("The role does not exist")
 		}
-		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
+		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		if(currentUserContext.members.find(member.id) === undefined){
 			currentUserContext.members.push(member.id)
 			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
@@ -84,12 +84,21 @@ function messageHandler(message){
 		if (!role) {
 	    	return console.log("The role does not exist")
 		}
-		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
+		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		if(currentUserContext.members.find(member.id) !== undefined){
 			var index = currentUserContext.members.findIndex(member.id)
 			currentUserContext.members.splice(index, 1)
 			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
 		}
+	}
+
+	if (command === "view-user-context") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		let role = message.guild.roles.find(role => role.name === args[1])
+		if (!role) {
+	    	return console.log("The role does not exist")
+		}
+		console.log(contextManager.get_user_context(role.name, author.id))
 	}
 }
 
