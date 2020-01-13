@@ -151,7 +151,7 @@ class ContextManagerClass {
 		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
-			return channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid)
+			return channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid).user_context
 		}
 		return undefined
 	}
