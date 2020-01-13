@@ -9,7 +9,6 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
-	//const uid = message.user.id;
 	const channel = message.channel.name;
 	const author = message.author;
 
