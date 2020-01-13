@@ -76,7 +76,7 @@ function messageHandler(message){
 	    	return message.reply("The role does not exist")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		if(currentUserContext.members.find((member) => member.id === undefined)){
+		if(currentUserContext.members.find((contextMember) => contextMember === member.id) === undefined){
 			currentUserContext.members.push(member.id)
 			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
 		}		
@@ -89,8 +89,8 @@ function messageHandler(message){
 	    	return message.reply("The role does not exist")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		if(currentUserContext.members.find((member) => member.id !== undefined)){
-			var index = currentUserContext.members.findIndex(member.id)
+		if(currentUserContext.members.find((contextMember) => contextMember === member.id) !== undefined){
+			var index = currentUserContext.members.findIndex((contextMember) => contextMember === member.id)
 			currentUserContext.members.splice(index, 1)
 			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
 		}
