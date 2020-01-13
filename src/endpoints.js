@@ -26,7 +26,7 @@ function messageHandler(message){
 			return message.reply("Please mention a valid member of this server");
 		}
 		
-		let votePassed = democracy.removeUser(uid, channel);
+		let votePassed = democracy.removeUser(member.id, channel);
 
 		if (votePassed) {
 			tr.removeUser(message, member);
@@ -38,7 +38,7 @@ function messageHandler(message){
 		if (!member) {
 			return message.reply("Please mention a valid member of this server");
 		}
-		let votePassed = democracy.addUser(uid, channel);
+		let votePassed = democracy.addUser(member.id, channel);
 
 		if (votePassed) {
 			tr.addUser(message, member);
@@ -50,7 +50,7 @@ function messageHandler(message){
 		if (!member) {
 			return message.reply("Please mention a valid member of this server");
 		}
-		let votePassed = democracy.promoteUser(uid, channel);
+		let votePassed = democracy.promoteUser(member.id, channel);
 
 		if (votePassed) {
 			tr.changeAdmin(message, member);
