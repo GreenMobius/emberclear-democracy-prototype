@@ -67,6 +67,7 @@ function messageHandler(message){
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		currentUserContext.admin = member.id
 		contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		return message.reply("Successfully changed admin to " + member.id)
 	}
 
 	if (command === "change-user-context-add-member") {
@@ -79,6 +80,7 @@ function messageHandler(message){
 		if(currentUserContext.members.find((contextMember) => contextMember === member.id) === undefined){
 			currentUserContext.members.push(member.id)
 			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+			return message.reply("Successfully added user " + member.id)
 		}		
 	}
 
@@ -93,6 +95,7 @@ function messageHandler(message){
 			var index = currentUserContext.members.findIndex((contextMember) => contextMember === member.id)
 			currentUserContext.members.splice(index, 1)
 			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+			return message.reply("Successfully removed user " + member.id)
 		}
 	}
 
