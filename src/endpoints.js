@@ -18,7 +18,7 @@ function messageHandler(message){
 	}
 
 	if (command === "create-channel") {
-		contextManager.add_channel(args[0], author)
+		contextManager.add_channel(args[0], author.id)
 	}
 	
 	if (command === "remove-member") {
