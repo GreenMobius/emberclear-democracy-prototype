@@ -1,17 +1,17 @@
 const config = require("../config.json");
 var voteInProgress = false;
+var state = null;
 const tr = require("./task-runner");
 const democracy = require("./democracy");
 const contextManager = require("./context-manager");
 
-function messageHandler(message){
+function messageHandler(message) {
 	if(message.author.bot) return;
 	if(message.content.indexOf(config.prefix) !== 0) return;
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
 	let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-	const uid = message.user.id;
 	const channel = message.channel.name;
 	const author = message.author;
 
@@ -25,8 +25,9 @@ function messageHandler(message){
 		if(voteInProgress) {
 			return message.reply("Error: A vote is already in progress.");
 		}
+		state = democracy.removeUser(member, channel);
 		voteInProgress = true;
-		return message.reply(Json.stringify(democracy.removeUser(member, channel));
+		return message.reply("Vote started to remove member " + state.uid);
 	}	
 
 	if (command === "add-member") {
@@ -35,8 +36,9 @@ function messageHandler(message){
 		if(voteInProgress) {
 			return message.reply("Error: A vote is already in progress.");
 		}
+		state = democracy.addUser(member, channel);
 		voteInProgress = true;
-		return message.reply(Json.stringify(democracy.addUser(member, channel)));
+		return message.reply("Vote started to add member " + state.uid);
 	}
 
 	if (command === "change-admin") {
@@ -45,11 +47,15 @@ function messageHandler(message){
 		if(voteInProgress) {
 			return message.reply("Error: A vote is already in progress.");
 		}
+		state = democracy.promoteUser(member, channel);
 		voteInProgress = true;
-		return message.reply(Json.stringify(democracy.changeAdmin(member, channel)));
+		return message.reply("Vote started to promote member " + state.uid);
 	}
 
 	if (command === "vote") {
+		if(!voteInProgress) {
+			return message.reply("There are no votes in progress.");
+		}
 		// invoke democracy vote
 		var response = args.shift().toLowerCase();
 		var vote;
@@ -73,49 +79,27 @@ function messageHandler(message){
 		if(voteStatus.yea.length > voteStatus.nay.length + voteStatus.remain.length) {
             switch(voteStatus.action) {
             	case "add":
-
+            		tr.addUser(message, voteStatus.uid);
+            		return message.reply("Vote has passed, adding user " + voteStatus.uid);
+            	case "remove":
+            		tr.removeUser(message, voteStatus.uid);
+            		return message.reply("Vote has passed, removing user " + voteStatus.uid);
+        		case "promote":
+            		tr.changeAdmin(message, voteStatus.uid);
+            		return message.reply("Vote has passed, promoting user " + voteStatus.uid);
+            	default:
+            		return message.reply("Vote has passed, but there was no action?");
             }
+            voteInProgress = false;
         }
 		// if fail, announce fail
 		if(voteStatus.nay.length > voteStatus.yea.length + voteStatus.remain.length) {
-            
+            return message.reply("Vote has failed. Nothing changes.");
+            voteInProgress = false;
         }
-=======
-		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if (!member) {
-			return message.reply("Please mention a valid member of this server");
-		}
-		
-		let votePassed = democracy.removeUser(uid, channel);
 
-		if (votePassed) {
-			tr.removeUser(message, member);
-		}
-	}	
-
-	if (command === "add-member") {
-		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if (!member) {
-			return message.reply("Please mention a valid member of this server");
-		}
-		let votePassed = democracy.addUser(uid, channel);
-
-		if (votePassed) {
-			tr.addUser(message, member);
-		}
-	}
-
-	if (command === "change-admin") {
-		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if (!member) {
-			return message.reply("Please mention a valid member of this server");
-		}
-		let votePassed = democracy.promoteUser(uid, channel);
-
-		if (votePassed) {
-			tr.changeAdmin(message, member);
-		}
-	}
+        return message.reply("Vote counted. There are now " + state.yea.length + " votes for, and " + state.nay.length + " votes against. " + state.remain.length + " votes remain.");
+    }
 
 	if (command === "change-user-context-admin") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
