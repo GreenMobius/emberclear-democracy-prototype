@@ -1,15 +1,13 @@
+const fs = require('fs')
+
 class ContextManagerClass {
 
-	constructor(){
-		this.contexts = []
-	}
-
 	get_all_contexts(){
-		return this.contexts
+		return JSON.parse(fs.readFileSync('contexts.json'))
 	}
 
 	save_all_contexts(contexts){
-		this.contexts = contexts
+		fs.writeFileSync('contexts.json', JSON.stringify(contexts))
 	}
 
 	add_channel(channel_uid, user_uid){
