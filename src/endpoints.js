@@ -9,12 +9,15 @@ function messageHandler(message){
 
 	const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
-	const uid = message.user.id;
 	const channel = message.channel.name;
 	const author = message.author;
 
 	if (command === "test") {
 		return message.reply("Status: OK");
+	}
+
+	if (command === "create-channel") {
+		contextManager.add_channel(args[0], author.id)
 	}
 	
 	if (command === "remove-member") {
@@ -23,7 +26,7 @@ function messageHandler(message){
 			return message.reply("Please mention a valid member of this server");
 		}
 		
-		let votePassed = democracy.removeUser(uid, channel);
+		let votePassed = democracy.removeUser(member.id, channel);
 
 		if (votePassed) {
 			tr.removeUser(message, member);
@@ -35,7 +38,7 @@ function messageHandler(message){
 		if (!member) {
 			return message.reply("Please mention a valid member of this server");
 		}
-		let votePassed = democracy.addUser(uid, channel);
+		let votePassed = democracy.addUser(member.id, channel);
 
 		if (votePassed) {
 			tr.addUser(message, member);
@@ -47,7 +50,7 @@ function messageHandler(message){
 		if (!member) {
 			return message.reply("Please mention a valid member of this server");
 		}
-		let votePassed = democracy.promoteUser(uid, channel);
+		let votePassed = democracy.promoteUser(member.id, channel);
 
 		if (votePassed) {
 			tr.changeAdmin(message, member);
@@ -58,23 +61,25 @@ function messageHandler(message){
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return console.log("The role does not exist")
+	    	return message.reply("The role does not exist")
 		}
-		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
+		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		currentUserContext.admin = member.id
 		contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		return message.reply("Successfully changed admin to " + member.id)
 	}
 
 	if (command === "change-user-context-add-member") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return console.log("The role does not exist")
+	    	return message.reply("The role does not exist")
 		}
-		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
-		if(currentUserContext.members.find(member.id) === undefined){
+		let currentUserContext = contextManager.get_user_context(role.name, author.id)
+		if(currentUserContext.members.find((contextMember) => contextMember === member.id) === undefined){
 			currentUserContext.members.push(member.id)
 			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+			return message.reply("Successfully added user " + member.id)
 		}		
 	}
 
@@ -82,14 +87,24 @@ function messageHandler(message){
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return console.log("The role does not exist")
+	    	return message.reply("The role does not exist")
 		}
-		let currentUserContext = contextManager.get_users_user_context(role.name, author.id)
-		if(currentUserContext.members.find(member.id) !== undefined){
-			var index = currentUserContext.members.findIndex(member.id)
+		let currentUserContext = contextManager.get_user_context(role.name, author.id)
+		if(currentUserContext.members.find((contextMember) => contextMember === member.id) !== undefined){
+			var index = currentUserContext.members.findIndex((contextMember) => contextMember === member.id)
 			currentUserContext.members.splice(index, 1)
 			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+			return message.reply("Successfully removed user " + member.id)
 		}
+	}
+
+	if (command === "view-user-context") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		let role = message.guild.roles.find(role => role.name === args[1])
+		if (!role) {
+	    	return message.reply("The role does not exist")
+		}
+		return message.reply(JSON.stringify(contextManager.get_user_context(role.name, author.id), null, 2))
 	}
 }
 

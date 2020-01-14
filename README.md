@@ -21,17 +21,22 @@ Channels and channel administrator memberships are represented using Discord rol
 Bot will provide its status. 'OK' means functional.
 
 ```
+?create-channel
+```
+Create a channel with you as the only member and as the admin
+
+```
 ?add-member [member] [channel]
 ```
 Initiate a vote to add the specified member to the specified channel. You cannot record a yes/no vote using this command. (Requires 51% to occur)
 
 ```
-?remove-member [member]
+?remove-member [member] [channel]
 ```
 Initiate a vote to remove the specified member from the specified channel. You cannot record a yes/no vote using this command. (Requires 51% to occur)
 
 ```
-?change-admin [member]
+?change-admin [member] [channel]
 ```
 Initiate a vote to make the specified member admin of the specified channel. You cannot record a yes/no vote using this command. (Requires 51% to occur)
 
@@ -39,3 +44,23 @@ Initiate a vote to make the specified member admin of the specified channel. You
 ?vote [yes/no]
 ```
 Vote yes or no on the issue at hand. Prints a summary of the current vote counts.
+
+```
+?change-user-context-add-member [member] [channel]
+```
+Change your user context to add a user to your version of a channel
+
+```
+?change-user-context-remove-member [member] [channel]
+```
+Change your user context to remove a user from your version of a channel
+
+```
+?change-user-context-admin [member] [channel]
+```
+Change your user context to set a user as the admin of your version of a channel
+
+```
+?view-user-context [member] [channel]
+```
+View a given user's context for a given channel

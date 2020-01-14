@@ -4,5 +4,7 @@
     "description": "emberclear democracy prototype",
     "main": "server.js",
     "author": "emberclear.io",
-    "dependencies": {}
+    "dependencies": {
+        "discord.js": "^11.5.1"
+    }
 }
