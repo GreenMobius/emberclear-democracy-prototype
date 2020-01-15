@@ -25,8 +25,9 @@ function messageHandler(message) {
 	
 	if (command === "remove-member") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if(!member)
-	  		return message.reply("Please mention a valid member of this server");
+		if (!member) {
+			return message.reply("Please mention a valid member of this server");
+		}
 		if(voteInProgress) {
 			return message.reply("Error: A vote is already in progress.");
 		}
@@ -38,8 +39,9 @@ function messageHandler(message) {
 
 	if (command === "add-member") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0]);
-		if(!member)
-	  		return message.reply("Please mention a valid member of this server");
+		if (!member) {
+			return message.reply("Please mention a valid member of this server");
+		}
 		if(voteInProgress) {
 			return message.reply("Error: A vote is already in progress.");
 		}
