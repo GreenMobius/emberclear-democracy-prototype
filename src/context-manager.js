@@ -1,8 +1,17 @@
-let ContextManager = {
+const fs = require('fs')
 
-	contexts: [],
+class ContextManagerClass {
 
-	add_channel: function(channel_uid, user_uid){
+	get_all_contexts(){
+		return JSON.parse(fs.readFileSync('contexts.json'))
+	}
+
+	save_all_contexts(contexts){
+		fs.writeFileSync('contexts.json', JSON.stringify(contexts))
+	}
+
+	add_channel(channel_uid, user_uid){
+		var contexts = this.get_all_contexts()
 		if(contexts.every((context) => context.channel !== channel_uid)){
 			contexts.push({
 				"channel": channel_uid,
@@ -16,10 +25,12 @@ let ContextManager = {
 			        }
 				}]
 			})
-		}	
-	},
+		}
+		this.save_all_contexts(contexts)
+	}
 
-	add_user: function(channel_uid, user_uid, author_uid){
+	add_user(channel_uid, user_uid, author_uid){
+		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
 			var authorContext = channelContext.find((userContext) => userContext.user = author_uid)
@@ -37,7 +48,7 @@ let ContextManager = {
 						})
 					}					
 				}
-				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
+				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -50,9 +61,11 @@ let ContextManager = {
 				})
 			}
 		}
-	},
+		this.save_all_contexts(contexts)
+	}
 
-	delete_user: function(channel_uid, user_uid, author_uid){
+	delete_user(channel_uid, user_uid, author_uid){
+		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
 			var authorContext = channelContext.find((userContext) => userContext.user = author_uid)
@@ -67,7 +80,7 @@ let ContextManager = {
 						channelContext.user_contexts.splice(userContextIndex, 1)
 					}
 				}
-				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
+				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -80,9 +93,11 @@ let ContextManager = {
 				})
 			}
 		}
-	},
+		this.save_all_contexts(contexts)
+	}
 
-	change_admin: function(channel_uid, user_uid, author_uid){
+	change_admin(channel_uid, user_uid, author_uid){
+		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
 			var authorContext = channelContext.find((userContext) => userContext.user = author_uid)
@@ -90,7 +105,7 @@ let ContextManager = {
 				if(authorContext.user_context.members.includes(user_uid)){
 					authorContext.user_context.admin = user_uid
 				}
-				get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
+				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -103,9 +118,11 @@ let ContextManager = {
 				})
 			}
 		}
-	},
+		this.save_all_contexts(contexts)
+	}
 
-	change_users_user_context: function(channel_uid, user_uid, user_context){
+	change_users_user_context(channel_uid, user_uid, user_context){
+		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
 			var userContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid)
@@ -113,9 +130,11 @@ let ContextManager = {
 				userContext.user_context = user_context
 			}
 		}
-	},
+		this.save_all_contexts(contexts)
+	}
 
-	get_relevant_user_contexts: function(channel_uid, author_uid){
+	get_relevant_user_contexts(channel_uid, author_uid){
+		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
 			var authorContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === author_uid)
@@ -125,6 +144,18 @@ let ContextManager = {
 		}
 		return []
 	}
+
+	get_user_context(channel_uid, user_uid){
+		var contexts = this.get_all_contexts()
+		var channelContext = contexts.find((context) => context.channel === channel_uid)
+		if(channelContext !== undefined){
+			return channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid).user_context
+		}
+		return undefined
+	}
+
 }
+
+const ContextManager = new ContextManagerClass()
 
 module.exports = ContextManager;
