@@ -4,21 +4,23 @@ let Democracy = {
 	voteState = {
 		chid : <target channel id>,
 		action: <add|remove|promote>,
-		uid : <target user id>,
+		target : <target user id>,
 		yea : [ <uid1>, <uid2> ],
 		nay : [ <uid3> ],
 		remain : [ <uid4>, <uid5> ],
 		time : <timestamp>,
-		previous : <link to previous state>
+		previous : <link to previous state>,
+        error: <error, null if none>
 	}
 	*/
 
     // returns an empty vote state
     // uid: user id, channel: channel (chid, members), action: <"add"|"remove"|"promote">
-    makeEmptyState: function (uid, channel, action) {
+    makeEmptyState: function (target, channel, action) {
         return {
+            "channel" : channel,
             "action" : action,
-            "uid" : uid,
+            "target" : target,
             "yea" : [],
             "nay" : [],
             "remain" : channel.members,
@@ -30,35 +32,41 @@ let Democracy = {
 
 	// initiate vote for adding a user
 	// uid: user id, channel: channel (chid, members)
-    addUser: function (uid, channel) {
-        console.log("Voting to add user " + uid + " to channel " + channel.chid + " with members: " + channel.members);
-        var state = this.makeEmptyState(uid, channel, "add");
-        return this.vote(uid, state, true);
+    addUser: function (sender, target, channel) {
+        console.log("Voting to add user " + target + " to channel " + channel.chid + " with members: " + channel.members);
+        //TODO: stop if sender is not in channel
+        //TODO: stop if target is already in channel
+        var state = this.makeEmptyState(target, channel, "add");
+        return state//this.vote(sender, state, true);
     },
     
     // initiate vote for removing a user
     // uid: user id, channel: channel (chid, members)
-    removeUser: function (uid, channel) {
-        console.log("Voting to remove user " + uid + " from channel " + channel.chid);
-        var state = this.makeEmptyState(uid, channel, "remove");
-        return this.vote(uid, state, true);
+    removeUser: function (sender, target, channel) {
+        console.log("Voting to remove user " + target + " from channel " + channel.chid);
+        //TODO: stop if sender is not in channel
+        //TODO: stop if target is not in channel
+        var state = this.makeEmptyState(target, channel, "remove");
+        return state//this.vote(sender, state, true);
     },
     
     // initiate vote for promoting a user
     // uid: user id, channel: channel (chid, members)
-    promoteUser: function (uid, channel) {
-        console.log("Voting to promote user " + uid + " in channel " + channel.chid);
-        var state = this.makeEmptyState(uid, channel, "promote");
-        return this.vote(uid, state, true);
+    promoteUser: function (sender, target, channel) {
+        console.log("Voting to promote user " + target + " in channel " + channel.chid);
+        //TODO: stop if sender is not in channel
+        //TODO: stop if target is already in channel
+        var state = this.makeEmptyState(target, channel, "promote");
+        return state//this.vote(sender, state, true);
     },
 
     // returns a (hopefully deep) clone of the given state
     // state: state object
     copyState: function (state) {
     	return {
-    		"chid" : state.chid,
+    		"channel" : state.channel,
     		"action" : state.action,
-    		"uid" : state.uid,
+    		"target" : state.target,
     		"yea" : state.yea,
     		"nay" : state.nay,
     		"remain" : state.remain,
@@ -68,23 +76,24 @@ let Democracy = {
     	}
     },
 
-    // creates a new state with the uid's vote
-    // uid: user id, prevState: state object, vote: boolean
-    vote: function (uid, prevState, vote) {
+    // creates a new state with the sender's vote
+    // sender: author of vote, prevState: state object, vote: boolean
+    vote: function (sender, prevState, vote) {
+        console.log("vote is " + vote)
     	// TODO: implement hashing previous state
     	// TODO: encrypt message with user's private key
     	// TODO: add validation logic for previous states
-    	if(!prevState.remain.includes(uid)) {
+    	if(!prevState.remain.includes(sender.id)) {
     		return {
-                "error": "Vote is invalid"
+                "error": "Vote is invalid. " + sender.id + " is not in the list " + prevState.remain
             }
     	}
-    	var state = this.copyState(prevState);
-    	state.remain = state.remain.filter(state.remain.indexOf(uid));
+    	var state = this.copyState(prevState)
+    	state.remain = state.remain.filter(memberId => !(memberId === sender.id))
     	if(vote) {
-            state.yea.push(uid);
+            state.yea.push(sender)
     	} else {
-    		state.nay.push(uid);
+    		state.nay.push(sender)
     	}
     	return state;
     }   
