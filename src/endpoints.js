@@ -14,7 +14,6 @@ function messageHandler(message) {
 	const command = args.shift().toLowerCase()
 	const channel = message.channel.name
 	const author = message.author
-	var currentUserContext
 
 	if (command === "test") {
 		return message.reply("Status: OK")
@@ -51,7 +50,7 @@ function messageHandler(message) {
 		voteInProgress = true
 		return message.reply("Vote started to add member " + member.id)
 	}
-	
+
 	else if (command === "remove-member") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
@@ -80,8 +79,9 @@ function messageHandler(message) {
 			"members": contextManager.get_user_context(role.name, author.id).members,
 			"admin": contextManager.get_user_context(role.name, author.id).admin
 		}
-		if(!member)
-	  		return message.reply("Please mention a valid member of this server")
+		if(!member) {
+			return message.reply("Please mention a valid member of this server")
+		}
 		if(voteInProgress) {
 			return message.reply("Error: A vote is already in progress.")
 		}
@@ -130,6 +130,7 @@ function messageHandler(message) {
 			case "N":
 			case "Nah":
 			case "Yesn't":
+			default:
 				vote = false
 				break
 		}
@@ -145,35 +146,35 @@ function messageHandler(message) {
 		// if pass, execute command
 		if(state.yea.length > state.nay.length + state.remain.length) {
 			voteInProgress = false
-            switch(state.action) {
-            	case "add":
-            		contextManager.add_user(channel.chid, state.target, author.id)
-            		tr.addUser(state.target, role)
-            		return message.reply("Vote has passed, adding user " + state.target)
-            	case "remove":
+			switch(state.action) {
+				case "add":
+					contextManager.add_user(channel.chid, state.target, author.id)
+					tr.addUser(state.target, role)
+					return message.reply("Vote has passed, adding user " + state.target)
+				case "remove":
 					contextManager.delete_user(channel.chid, state.target, author.id)
 					tr.removeUser(state.target, role)
-            		return message.reply("Vote has passed, removing user " + state.target)
-        		case "promote":
-	        		contextManager.change_admin(channel.chid, state.target, author.id)
-	        		tr.changeAdmin(state.target, role)
-            		return message.reply("Vote has passed, promoting user " + state.target)
-            	default:
-            		return message.reply("Vote has passed, but there was no action?")
-            }
-        }
+					return message.reply("Vote has passed, removing user " + state.target)
+				case "promote":
+					contextManager.change_admin(channel.chid, state.target, author.id)
+					tr.changeAdmin(state.target, role)
+					return message.reply("Vote has passed, promoting user " + state.target)
+				default:
+					return message.reply("Vote has passed, but there was no action?")
+			}
+		}
 		// if fail, announce fail
 		if(state.nay.length > state.yea.length + state.remain.length) {
 			voteInProgress = false
-            return message.reply("Vote has failed. Nothing changes.")
-        }
-    }
+			return message.reply("Vote has failed. Nothing changes.")
+		}
+	}
 
 	else if (command === "change-user-context-admin") {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return message.reply("The role does not exist or no role was provided")
+			return message.reply("The role does not exist or no role was provided")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		currentUserContext.admin = member.id
@@ -185,7 +186,7 @@ function messageHandler(message) {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return message.reply("The role does not exist or no role was provided")
+			return message.reply("The role does not exist or no role was provided")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		if(currentUserContext.members.find((contextMember) => contextMember === member.id) === undefined) {
@@ -199,7 +200,7 @@ function messageHandler(message) {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return message.reply("The role does not exist or no role was provided")
+			return message.reply("The role does not exist or no role was provided")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, author.id)
 		if(currentUserContext.members.find((contextMember) => contextMember === member.id) !== undefined){
@@ -214,7 +215,7 @@ function messageHandler(message) {
 		let member = message.mentions.members.first() || message.guild.members.get(args[0])
 		let role = message.guild.roles.find(role => role.name === args[1])
 		if (!role) {
-	    	return message.reply("The role does not exist or no role was provided")
+			return message.reply("The role does not exist or no role was provided")
 		}
 		let currentUserContext = contextManager.get_user_context(role.name, member.id)
 		if(!currentUserContext) {
@@ -222,26 +223,26 @@ function messageHandler(message) {
 		}
 		return message.reply(JSON.stringify(currentUserContext, null, 2))
 	}
-
+	
 	else if (command === "cancel-vote") {
 		state = null;
 		voteInProgress = false;
 	}
-
+	
 	else {
 		return message.reply("Available commands: \n\
-			test \n\
-			state \n\
-			add-member [user] [role]\n\
-			remove-member [user] [role]\n\
-			change-admin [user] [role]\n\
-			vote [yes/no]\n\
-			create-channel [role]\n\
-			change-user-context-admin [user] [role]\n\
-			change-user-context-add-user [user] [role]\n\
-			change-user-context-remove-user [user] [role]\n\
-			view-user-context [user] [role]\n"
-			)
+		test \n\
+		state \n\
+		add-member [user] [role]\n\
+		remove-member [user] [role]\n\
+		change-admin [user] [role]\n\
+		vote [yes/no]\n\
+		create-channel [role]\n\
+		change-user-context-admin [user] [role]\n\
+		change-user-context-add-user [user] [role]\n\
+		change-user-context-remove-user [user] [role]\n\
+		view-user-context [user] [role]\n"
+		)
 	}
 }
 
