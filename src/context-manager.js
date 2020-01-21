@@ -35,27 +35,30 @@ class ContextManagerClass {
 		if(channelContext !== undefined){
 			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
 			if(authorContext !== undefined){
-				if(authorContext.user_context.members.includes(user_uid) === undefined){
+				if(!authorContext.user_context.members.includes(user_uid)){
+					console.log("user: " + user_uid + "is not already in the channel")
 					authorContext.user_context.members.push(user_uid)
 					var userToAddContext = channelContext.user_contexts.find((userContext) => userContext.user === user_uid)
+
+					console.log("Setting user context to " + JSON.stringify(authorContext.user_context))
 					if(userToAddContext !== undefined){
-						userToAddContext.user_context = authorContext.user_context
+						userToAddContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
 					}
 					else{
 						channelContext.user_contexts.push({
 							"user": user_uid,
-							"user_context": authorContext.user_context
+							"user_context": JSON.parse(JSON.stringify(authorContext.user_context))
 						})
-					}					
+					}				
 				}
 				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
-						var membersDiff = user_context.user_context.members
+						var membersDiff = userContext.user_context.members
 							.filter(member => !authorContext.user_context.members.includes(member))
 							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
 						if(isAdminMatch && membersDiff.length === 1 && membersDiff[0] === user_uid && authorContext.user_context.members.includes(user_uid)){
-							userContext.user_context = authorContext.user_context
+							userContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
 						}
 					}
 				})
@@ -70,24 +73,24 @@ class ContextManagerClass {
 		if(channelContext !== undefined){
 			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
 			if(authorContext !== undefined){
-				if(!authorContext.user_context.members.includes(user_uid)){
+				if(authorContext.user_context.members.includes(user_uid)){
 					var userMemberIndex = authorContext.user_context.members.findIndex((member) => member === user_uid)
 					if(userMemberIndex !== -1){
 						authorContext.user_context.members.splice(userMemberIndex, 1)
 					}
 					var userContextIndex = channelContext.user_contexts.findIndex((userContext) => userContext.user === user_uid)
-					if(userContext !== -1){
+					if(userContextIndex !== -1){
 						channelContext.user_contexts.splice(userContextIndex, 1)
 					}
 				}
 				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
-						var membersDiff = user_context.user_context.members
+						var membersDiff = userContext.user_context.members
 							.filter(member => !authorContext.user_context.members.includes(member))
 							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
 						if(isAdminMatch && membersDiff.length === 1 && membersDiff[0] === user_uid && userContext.user_context.members.includes(user_uid)){
-							userContext.user_context = authorContext.user_context
+							userContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
 						}
 					}					
 				})
@@ -112,7 +115,7 @@ class ContextManagerClass {
 							.filter(member => !authorContext.user_context.members.includes(member))
 							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
 						if(!isAdminMatch && membersDiff.length === 0){
-							userContext.user_context = authorContext.user_context
+							userContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
 						}
 					}
 				})
