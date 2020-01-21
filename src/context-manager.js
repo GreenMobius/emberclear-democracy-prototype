@@ -33,7 +33,7 @@ class ContextManagerClass {
 		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
-			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
+			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user === author_uid)
 			if(authorContext !== undefined){
 				if(!authorContext.user_context.members.includes(user_uid)){
 					console.log("user: " + user_uid + "is not already in the channel")
@@ -73,7 +73,7 @@ class ContextManagerClass {
 		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
-			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
+			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user === author_uid)
 			if(authorContext !== undefined){
 				if(authorContext.user_context.members.includes(user_uid)){
 					authorContext.user_context.members = authorContext.user_context.members.filter((member) => member !== user_uid)
@@ -101,7 +101,7 @@ class ContextManagerClass {
 		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
-			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
+			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user === author_uid)
 			if(authorContext !== undefined){
 				if(authorContext.user_context.members.includes(user_uid)){
 					authorContext.user_context.admin = user_uid
