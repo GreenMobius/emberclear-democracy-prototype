@@ -33,9 +33,9 @@ class ContextManagerClass {
 		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
-			var authorContext = channelContext.find((userContext) => userContext.user = author_uid)
+			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
 			if(authorContext !== undefined){
-				if(authorContext.user_context.members.find(user_uid) === undefined){
+				if(authorContext.user_context.members.includes(user_uid) === undefined){
 					authorContext.user_context.members.push(user_uid)
 					var userToAddContext = channelContext.user_contexts.find((userContext) => userContext.user === user_uid)
 					if(userToAddContext !== undefined){
@@ -57,7 +57,7 @@ class ContextManagerClass {
 						if(isAdminMatch && membersDiff.length === 1 && membersDiff[0] === user_uid && authorContext.user_context.members.includes(user_uid)){
 							userContext.user_context = authorContext.user_context
 						}
-					}					
+					}
 				})
 			}
 		}
@@ -68,9 +68,9 @@ class ContextManagerClass {
 		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
-			var authorContext = channelContext.find((userContext) => userContext.user = author_uid)
+			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
 			if(authorContext !== undefined){
-				if(authorContext.user_context.members.find(user_uid) !== undefined){
+				if(!authorContext.user_context.members.includes(user_uid)){
 					var userMemberIndex = authorContext.user_context.members.findIndex((member) => member === user_uid)
 					if(userMemberIndex !== -1){
 						authorContext.user_context.members.splice(userMemberIndex, 1)
@@ -100,7 +100,7 @@ class ContextManagerClass {
 		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
-			var authorContext = channelContext.find((userContext) => userContext.user = author_uid)
+			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
 			if(authorContext !== undefined){
 				if(authorContext.user_context.members.includes(user_uid)){
 					authorContext.user_context.admin = user_uid
@@ -149,7 +149,11 @@ class ContextManagerClass {
 		var contexts = this.get_all_contexts()
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
-			return channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid).user_context
+			let userContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid)
+			if(!userContext) {
+				return null
+			}
+			return userContext.user_context
 		}
 		return undefined
 	}
