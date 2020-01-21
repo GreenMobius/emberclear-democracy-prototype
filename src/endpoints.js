@@ -148,15 +148,15 @@ function messageHandler(message) {
 			voteInProgress = false
 			switch(state.action) {
 				case "add":
-					contextManager.add_user(channel.chid, state.target, author.id)
+					contextManager.add_user(channel.chid, state.target.id, author.id)
 					tr.addUser(state.target, role)
 					return message.reply("Vote has passed, adding user " + state.target)
 				case "remove":
-					contextManager.delete_user(channel.chid, state.target, author.id)
+					contextManager.delete_user(channel.chid, state.target.id, author.id)
 					tr.removeUser(state.target, role)
 					return message.reply("Vote has passed, removing user " + state.target)
 				case "promote":
-					contextManager.change_admin(channel.chid, state.target, author.id)
+					contextManager.change_admin(channel.chid, state.target.id, author.id)
 					tr.changeAdmin(state.target, role)
 					return message.reply("Vote has passed, promoting user " + state.target)
 				default:
