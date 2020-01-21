@@ -147,27 +147,16 @@ function messageHandler(message) {
 			voteInProgress = false
             switch(state.action) {
             	case "add":
-            		currentUserContext = contextManager.get_user_context(role.name, message.author.id)
-					if(currentUserContext.members.find((contextMember) => contextMember === state.target.id) === undefined) {
-						currentUserContext.members.push(state.target.id)
-						contextManager.change_users_user_context(role.name, message.author.id, currentUserContext)
-					}
+            		contextManager.add_user(channel.chid, state.target, author.id)
             		tr.addUser(state.target, role)
             		return message.reply("Vote has passed, adding user " + state.target)
             	case "remove":
-					currentUserContext = contextManager.get_user_context(role.name, message.author.id)
-					if(currentUserContext.members.find((contextMember) => contextMember === state.target.id) !== undefined){
-						var index = currentUserContext.members.findIndex((contextMember) => contextMember === state.target.id)
-						currentUserContext.members.splice(index, 1)
-						contextManager.change_users_user_context(role.name, message.author.id, currentUserContext)
-					}
-            		tr.removeUser(state.target, role)
+					contextManager.delete_user(channel.chid, state.target, author.id)
+					tr.removeUser(state.target, role)
             		return message.reply("Vote has passed, removing user " + state.target)
         		case "promote":
-	        		currentUserContext = contextManager.get_user_context(role.name, message.author.id)
-					currentUserContext.admin = state.target.id
-					contextManager.change_users_user_context(role.name, state.target.id, currentUserContext)
-            		tr.changeAdmin(state.target, role)
+	        		contextManager.change_admin(channel.chid, state.target, author.id)
+	        		tr.changeAdmin(state.target, role)
             		return message.reply("Vote has passed, promoting user " + state.target)
             	default:
             		return message.reply("Vote has passed, but there was no action?")
@@ -227,7 +216,11 @@ function messageHandler(message) {
 		if (!role) {
 	    	return message.reply("The role does not exist or no role was provided")
 		}
-		return message.reply(JSON.stringify(contextManager.get_user_context(role.name, author.id), null, 2))
+		let currentUserContext = contextManager.get_user_context(role.name, member.id)
+		if(!currentUserContext) {
+			return message.reply("There is currently no context for that user and role")
+		}
+		return message.reply(JSON.stringify(currentUserContext, null, 2))
 	}
 
 	else if (command === "cancel-vote") {
