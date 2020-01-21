@@ -57,8 +57,10 @@ class ContextManagerClass {
 						var membersDiff = userContext.user_context.members
 							.filter(member => !authorContext.user_context.members.includes(member))
 							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
+						console.log("member diff = " + membersDiff)
 						if(isAdminMatch && membersDiff.length === 1 && membersDiff[0] === user_uid && authorContext.user_context.members.includes(user_uid)){
 							userContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
+							console.log("user: " + userContext.user + " context set to: " + JSON.stringify(userContext.user_context))
 						}
 					}
 				})
@@ -74,14 +76,8 @@ class ContextManagerClass {
 			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user = author_uid)
 			if(authorContext !== undefined){
 				if(authorContext.user_context.members.includes(user_uid)){
-					var userMemberIndex = authorContext.user_context.members.findIndex((member) => member === user_uid)
-					if(userMemberIndex !== -1){
-						authorContext.user_context.members.splice(userMemberIndex, 1)
-					}
-					var userContextIndex = channelContext.user_contexts.findIndex((userContext) => userContext.user === user_uid)
-					if(userContextIndex !== -1){
-						channelContext.user_contexts.splice(userContextIndex, 1)
-					}
+					authorContext.user_context.members = authorContext.user_context.members.filter((member) => member !== user_uid)
+					channelContext.user_contexts = channelContext.user_contexts.filter((userContext) => userContext.user !== user_uid)
 				}
 				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
@@ -89,10 +85,12 @@ class ContextManagerClass {
 						var membersDiff = userContext.user_context.members
 							.filter(member => !authorContext.user_context.members.includes(member))
 							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
+						console.log("member diff = " + membersDiff)
 						if(isAdminMatch && membersDiff.length === 1 && membersDiff[0] === user_uid && userContext.user_context.members.includes(user_uid)){
 							userContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
+							console.log("user: " + userContext.user + " context set to: " + JSON.stringify(userContext.user_context))
 						}
-					}					
+					}
 				})
 			}
 		}
@@ -142,6 +140,7 @@ class ContextManagerClass {
 		if(channelContext !== undefined){
 			var authorContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === author_uid)
 			if(authorContext !== undefined){
+				console.log("Relevant Contexts are: " + JSON.stringify(channelContext.user_contexts.filter((userContext) => authorContext.user_context.members.includes(userContext.user))))
 				return channelContext.user_contexts.filter((userContext) => authorContext.user_context.members.includes(userContext.user))
 			}
 		}
