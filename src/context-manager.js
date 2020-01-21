@@ -7,6 +7,7 @@ class ContextManagerClass {
 	}
 
 	save_all_contexts(contexts){
+		console.log("saving: " + JSON.stringify(contexts, null, 2))
 		fs.writeFileSync('contexts.json', JSON.stringify(contexts))
 	}
 
@@ -51,7 +52,7 @@ class ContextManagerClass {
 						})
 					}				
 				}
-				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
+				this.get_relevant_user_contexts(contexts, channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = userContext.user_context.members
@@ -79,7 +80,7 @@ class ContextManagerClass {
 					authorContext.user_context.members = authorContext.user_context.members.filter((member) => member !== user_uid)
 					channelContext.user_contexts = channelContext.user_contexts.filter((userContext) => userContext.user !== user_uid)
 				}
-				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
+				this.get_relevant_user_contexts(contexts, channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = userContext.user_context.members
@@ -106,7 +107,7 @@ class ContextManagerClass {
 				if(authorContext.user_context.members.includes(user_uid)){
 					authorContext.user_context.admin = user_uid
 				}
-				this.get_relevant_user_contexts(channel_uid, author_uid).forEach((userContext) => {
+				this.get_relevant_user_contexts(contexts, channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
 						var membersDiff = user_context.user_context.members
@@ -134,8 +135,7 @@ class ContextManagerClass {
 		this.save_all_contexts(contexts)
 	}
 
-	get_relevant_user_contexts(channel_uid, author_uid){
-		var contexts = this.get_all_contexts()
+	get_relevant_user_contexts(contexts, channel_uid, author_uid){
 		var channelContext = contexts.find((context) => context.channel === channel_uid)
 		if(channelContext !== undefined){
 			var authorContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === author_uid)
@@ -155,6 +155,7 @@ class ContextManagerClass {
 			if(!userContext) {
 				return null
 			}
+			console.log("Displaying user: " + user_uid + " as: " + JSON.stringify(userContext.user_context))
 			return userContext.user_context
 		}
 		return undefined
