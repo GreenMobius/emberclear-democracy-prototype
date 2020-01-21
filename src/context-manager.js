@@ -110,7 +110,7 @@ class ContextManagerClass {
 				this.get_relevant_user_contexts(contexts, channel_uid, author_uid).forEach((userContext) => {
 					if(userContext.user !== authorContext.user){
 						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
-						var membersDiff = user_context.user_context.members
+						var membersDiff = userContext.user_context.members
 							.filter(member => !authorContext.user_context.members.includes(member))
 							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
 						if(!isAdminMatch && membersDiff.length === 0){
