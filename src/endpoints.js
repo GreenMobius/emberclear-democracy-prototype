@@ -237,14 +237,15 @@ function messageHandler(message) {
 		return message.reply("Available commands: \n\
 		test \n\
 		state \n\
+		create-channel [role]\n\
 		add-member [user] [role]\n\
 		remove-member [user] [role]\n\
 		change-admin [user] [role]\n\
 		vote [yes/no]\n\
 		create-channel [role]\n\
 		change-user-context-admin [user] [role]\n\
-		change-user-context-add-user [user] [role]\n\
-		change-user-context-remove-user [user] [role]\n\
+		change-user-context-add-member [user] [role]\n\
+		change-user-context-remove-member [user] [role]\n\
 		view-user-context [user] [role]\n\
 		cancel-vote\n\
 		reset\n"
