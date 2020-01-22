@@ -4,14 +4,17 @@ const client = new Discord.Client();
 
 let TaskRunner = {
     addUser: function(member, role) {
+        console.log("member: " + JSON.stringify(member, null, 2))
         member.addRole(role);
     },
     
     removeUser: function(member, role) {
+        console.log("member: " + JSON.stringify(member, null, 2))
         member.removeRole(role);
     },
     
     changeAdmin: function(member, role) {
+        console.log("member: " + JSON.stringify(member, null, 2))
         // TODO agree on how to represent admin of channel
         //const adminRoleString = `${role.name}_admin`;
         const guild = client.guilds.array.filter(guild => guild.id === config.guildId)[0];
