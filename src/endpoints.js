@@ -228,6 +228,10 @@ function messageHandler(message) {
 		state = null;
 		voteInProgress = false;
 	}
+
+	else if (command === "reset") {
+		contextManager.save_all_contexts([])
+	}
 	
 	else {
 		return message.reply("Available commands: \n\
@@ -241,7 +245,9 @@ function messageHandler(message) {
 		change-user-context-admin [user] [role]\n\
 		change-user-context-add-user [user] [role]\n\
 		change-user-context-remove-user [user] [role]\n\
-		view-user-context [user] [role]\n"
+		view-user-context [user] [role]\n\
+		cancel-vote\n\
+		reset\n"
 		)
 	}
 }
