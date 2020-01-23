@@ -14,15 +14,36 @@ class ContextManagerClass {
 	add_channel(channel_uid, user_uid){
 		var contexts = this.get_all_contexts()
 		if(contexts.every((context) => context.channel !== channel_uid)){
+			// contexts.push({
+			// 	"channel": channel_uid,
+			// 	"user_contexts": [{
+			// 		"user": user_uid,
+			//         "user_context": {
+			//         	"admin": user_uid,
+			//         	"members": [
+			//             	user_uid
+			//           	]
+			//         }
+			// 	}]
+			// })
 			contexts.push({
-				"channel": channel_uid,
-				"user_contexts": [{
-					"user": user_uid,
+				"user": user_uid,
+				"channel_contexts": [{
+					"channel": channel_uid,
 			        "user_context": {
 			        	"admin": user_uid,
 			        	"members": [
 			            	user_uid
-			          	]
+			          	],
+			          	"active_votes": [],
+			          	"contextChain": {
+			          		"admin": user_uid,
+			          		"members": [
+				            	user_uid
+				          	],
+				          	"supporting_vote": undefined,
+				          	"previous_chain": undefined
+			          	}
 			        }
 				}]
 			})
