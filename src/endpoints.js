@@ -29,7 +29,7 @@ function messageHandler(message) {
 		}
 		contextManager.add_channel(args[0], author.id)
 		tr.createChannel(message.guild, args[0], author)
-		return message.reply("Created channel " + arg[0])
+		return message.reply("Created channel " + args[0])
 	}
 
 	else if (command === "add-member") {
@@ -232,6 +232,7 @@ function messageHandler(message) {
 
 	else if (command === "reset") {
 		contextManager.save_all_contexts([])
+		tr.reset()
 	}
 
 	else if (command === "sync-discord-roles") {
