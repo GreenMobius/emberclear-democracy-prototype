@@ -2,16 +2,26 @@ const config = require('../config.json');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-let TaskRunner = {
-    addUser: function(member, role) {
+class TaskRunnerClass {
+    
+    createChannel(guild, channelName, member) {
+        guild.createRole({
+            name: channelName
+        })
+        let role = guild.roles.find(role => role.name === channelName)
+        this.addUser(member, role)
+        this.changeAdmin(member, role)
+    }
+
+    addUser(member, role) {
         member.addRole(role);
-    },
+    }
     
-    removeUser: function(member, role) {
+    removeUser(member, role) {
         member.removeRole(role);
-    },
+    }
     
-    changeAdmin: function(member, role) {
+    changeAdmin(member, role) {
         // TODO agree on how to represent admin of channel
         //const adminRoleString = `${role.name}_admin`;
         const guild = client.guilds.array.filter(guild => guild.id === config.guildId)[0];
@@ -20,7 +30,24 @@ let TaskRunner = {
             currentAdmin.removeRole(adminRole);
         }
         member.addRole(adminRole);
-    },
+    }
+
+    reset() {
+        client.guilds.array.forEach((guild) => guild.roles = [])
+    }
+
+    setStatus(userContext, role) {
+        this.reset()
+        const guild = client.guilds.array.filter(guild => guild.id === config.guildId)[0]
+        const admin = guild.members.find((member) => member.id === userContext.admin)
+        this.changeAdmin(admin, role)
+        userContext.members.forEach((member) => {
+            let memberObject = guild.members.find((specificMember) => specificMember.id === member)
+            this.addUser(memberObject, role)
+        })
+    }
 }
 
- module.exports = TaskRunner;
+const TaskRunner = new TaskRunnerClass()
+
+module.exports = TaskRunner;

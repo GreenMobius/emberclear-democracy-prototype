@@ -24,10 +24,11 @@ function messageHandler(message) {
 	}
 
 	else if (command === "create-channel") {
-		let role = message.guild.roles.find(role => role.name === args[0])
-		contextManager.add_channel(role.name, author.id)
-		tr.addUser(author, role)
-		tr.changeAdmin(author, role)
+		if(args[0] === undefined){
+			return message.reply("Please provide a channel name");
+		}
+		contextManager.add_channel(args[0], author.id)
+		tr.createChannel(message.guild, args[0], author)
 		return message.reply("Created channel " + arg[0])
 	}
 
@@ -231,6 +232,19 @@ function messageHandler(message) {
 
 	else if (command === "reset") {
 		contextManager.save_all_contexts([])
+	}
+
+	else if (command === "sync-discord-roles") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		let role = message.guild.roles.find(role => role.name === args[1])
+		if (!role) {
+			return message.reply("The role does not exist or no role was provided")
+		}
+		let currentUserContext = contextManager.get_user_context(role.name, member.id)
+		if(!currentUserContext) {
+			return message.reply("There is currently no context for that user and role")
+		}
+		tr.setStatus(currentUserContext, role)
 	}
 	
 	else {
