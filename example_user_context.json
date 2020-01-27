@@ -1,52 +1,23 @@
 [
   {
-    "channel": "discord_channel_uid1",
-    "user_context": [
-      {
-        "user": "discord_uid",
-        "user_context": {
-          "admin": "discord_uid",
-          "members": [
-            "discord_uid1",
-            "discord_uid2"
-          ]
-        }
-      },
-      {
-        "user": "discord_uid",
-        "user_context": {
-          "admin": "discord_uid",
-          "members": [
-            "discord_uid1",
-            "discord_uid2"
-          ]
-        }
-      }
-    ]
-  },
-  {
-    "channel": "discord_channel_uid2",
-    "user_context": [
-      {
-        "user": "discord_uid",
-        "user_context": {
-          "admin": "discord_uid",
-          "members": [
-            "discord_uid1",
-            "discord_uid2"
-          ]
-        }
-      },
-      {
-        "user": "discord_uid",
-        "user_context": {
-          "admin": "discord_uid",
-          "members": [
-            "discord_uid1",
-            "discord_uid2"
-          ]
-        }
-      }
-    ]
-  }  
+    "user": "user_uid",
+    "channel_contexts": [{
+      "channel": "channel_uid",
+          "user_context": {
+            "admin": "user_uid",
+            "members": [
+                "user_uid"
+              ],
+              "active_votes": [],
+              "contextChain": {
+                "admin": "user_uid",
+                "members": [
+                  "user_uid"
+                ],
+                "supporting_vote": "undefined",
+                "previous_chain": "undefined"
+              }
+          }
+    }]
+  }
 ]
