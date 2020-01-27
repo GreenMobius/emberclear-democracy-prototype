@@ -176,10 +176,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		currentUserContext.admin = member.id
-		contextManager.change_users_user_context(role.name, author.id, currentUserContext)
-		return message.reply("Successfully changed admin to " + member.id)
+		if(contextManager.change_users_user_context_change_admin(role.name, member.id, author.id)){
+			return message.reply("Successfully changed admin to user " + member.id)
+		}
+		return message.reply("Encountered error changing admin to user " + member.id)
 	}
 
 	else if (command === "change-user-context-add-member") {
@@ -188,12 +188,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		if(currentUserContext.members.find((contextMember) => contextMember === member.id) === undefined) {
-			currentUserContext.members.push(member.id)
-			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		if(contextManager.change_users_user_context_add_member(role.name, member.id, author.id)){
 			return message.reply("Successfully added user " + member.id)
-		}		
+		}
+		return message.reply("Encountered error adding user " + member.id)
 	}
 
 	else if (command === "change-user-context-remove-member") {
@@ -202,13 +200,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		if(currentUserContext.members.find((contextMember) => contextMember === member.id) !== undefined){
-			var index = currentUserContext.members.findIndex((contextMember) => contextMember === member.id)
-			currentUserContext.members.splice(index, 1)
-			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		if(contextManager.change_users_user_context_remove_member(role.name, member.id, author.id)){
 			return message.reply("Successfully removed user " + member.id)
 		}
+		return message.reply("Encountered error removing user " + member.id)
 	}
 
 	else if (command === "view-user-context") {

@@ -145,13 +145,43 @@ class ContextManagerClass {
 	change_users_user_context(channel_uid, user_uid, user_context){
 		var contexts = this.get_all_contexts()
 		var authorContext = contexts.find((context) => context.user === user_uid)
-		if(userContext !== undefined){
+		var success = false
+		if(authorContext !== undefined){
 			var channelContext = authorContext.channel_contexts.find((channel) => channel.channel === channel_uid)
 			if(channelContext !== undefined){
 				channelContext.user_context = user_context
+				success = true
 			}
 		}
 		this.save_all_contexts(contexts)
+		return success
+	}
+
+	change_users_user_context_add_member(channel_uid, user_uid, author_uid){
+		var currentUserContext = this.get_user_context(channel_uid, author_uid)
+		if(currentUserContext !== undefined && !currentUserContext.members.includes(user_uid)) {
+			currentUserContext.members.push(user_uid)
+			return this.change_users_user_context(channel_uid, author_uid, currentUserContext)
+		}
+		return false
+	}
+
+	change_users_user_context_remove_member(channel_uid, user_uid, author_uid){
+		var currentUserContext = this.get_user_context(channel_uid, author_uid)
+		if(currentUserContext !== undefined && currentUserContext.members.includes(user_uid)) {
+			currentUserContext.members = currentUserContext.members.filter((member) => member !== user_uid)
+			return this.change_users_user_context(channel_uid, author_uid, currentUserContext)
+		}
+		return false
+	}
+
+	change_users_user_context_change_admin(channel_uid, user_uid, author_uid){
+		var currentUserContext = this.get_user_context(channel_uid, author_uid)
+		if(currentUserContext !== undefined){
+			currentUserContext.admin = user_uid
+			return this.change_users_user_context(channel_uid, author_uid, currentUserContext)
+		}
+		return false
 	}
 
 	get_relevant_user_contexts(contexts, channel_uid, author_uid){
