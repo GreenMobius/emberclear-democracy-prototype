@@ -166,37 +166,33 @@ class ContextManagerClass {
 	}
 
 	get_relevant_user_contexts(contexts, channel_uid, author_uid){
-		var authorContext = contexts.find((context) => context.user === author_uid)
+		var authorContext = this.get_user_context_with_contexts_defined(contexts, channel_uid, author_uid)
 		if(authorContext !== undefined){
-			var authorChannelContext = authorContext.channel_contexts.find((channel) => channel.channel === channel_uid)
-			if(authorChannelContext !== undefined){
-				var toReturn = []
-				authorChannelContext.user_context.members.forEach((member) => {
-					var memberContext = contexts.find((context) => context.user === member)
-					if(memberContext !== undefined){
-						var memberChannelContext = memberContext.channel_contexts.find((channel) => channel.channel === channel_uid)
-						if(memberChannelContext !== undefined){
-							toReturn.push(memberChannelContext.user_context)
-						}
-					}
-				})
-				console.log("Relevant Contexts are: " + JSON.stringify(toReturn))
-				return toReturn
-			}
+			var toReturn = []
+			authorContext.members.forEach((member) => {
+				var memberContext = this.get_user_context_with_contexts_defined(contexts, channel_uid, member)
+				if(memberContext !== undefined){
+					toReturn.push(memberContext)
+				}
+			})
+			console.log("Relevant Contexts are: " + JSON.stringify(toReturn))
+			return toReturn
 		}
 		return []
 	}
 
 	get_user_context(channel_uid, user_uid){
 		var contexts = this.get_all_contexts()
-		var channelContext = contexts.find((context) => context.channel === channel_uid)
-		if(channelContext !== undefined){
-			let userContext = channelContext.user_contexts.find((currentUserContext) => currentUserContext.user === user_uid)
-			if(!userContext) {
-				return null
+		return this.get_user_context_with_contexts_defined(contexts, channel_uid, user_uid)
+	}
+
+	get_user_context_with_contexts_defined(contexts, channel_uid, user_uid){
+		var userContext = contexts.find((context) => context.user === user_uid)
+		if(userContext !== undefined){
+			var channelContext = userContext.channel_contexts.find((channel) => channel.channel === channel_uid)
+			if(channelContext !== undefined){
+				return channelContext.user_context
 			}
-			console.log("Displaying user: " + user_uid + " as: " + JSON.stringify(userContext.user_context))
-			return userContext.user_context
 		}
 		return undefined
 	}
