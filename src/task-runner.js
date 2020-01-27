@@ -34,7 +34,12 @@ class TaskRunnerClass {
     }
 
     reset() {
-        client.guilds.forEach((guild) => guild.roles = [])
+        client.guilds.forEach((guild) => {
+            console.log('clearing roles from ${guild.name}')
+            guild.roles.forEach((role) => {
+                role.delete().then(deleted => console.log('deleted role ${deleted.name}'))
+            })
+        })
     }
 
     setStatus(userContext, role) {
