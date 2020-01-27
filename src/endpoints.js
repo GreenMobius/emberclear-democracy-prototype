@@ -237,7 +237,6 @@ function messageHandler(message) {
 		remove-member [user] [role]\n\
 		change-admin [user] [role]\n\
 		vote [yes/no]\n\
-		create-channel [role]\n\
 		change-user-context-admin [user] [role]\n\
 		change-user-context-add-member [user] [role]\n\
 		change-user-context-remove-member [user] [role]\n\
