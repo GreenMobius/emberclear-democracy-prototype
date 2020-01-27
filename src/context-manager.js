@@ -62,40 +62,42 @@ class ContextManagerClass {
 
 	add_user(channel_uid, user_uid, author_uid){
 		var contexts = this.get_all_contexts()
-		var channelContext = contexts.find((context) => context.channel === channel_uid)
-		if(channelContext !== undefined){
-			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user === author_uid)
-			if(authorContext !== undefined){
-				if(!authorContext.user_context.members.includes(user_uid)){
-					console.log("user: " + user_uid + "is not already in the channel")
-					authorContext.user_context.members.push(user_uid)
-					var userToAddContext = channelContext.user_contexts.find((userContext) => userContext.user === user_uid)
-
-					console.log("Setting user context to " + JSON.stringify(authorContext.user_context))
-					if(userToAddContext !== undefined){
-						userToAddContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
+		var authorContext = this.get_user_context_with_contexts_defined(contexts, channel_uid, author_uid)
+		if(authorContext !== undefined){
+			if(!authorContext.members.includes(user_uid)){
+				authorContext.members.push(user_uid)
+				var newMemberContext = this.get_user_context_with_contexts_defined(contexts, channel_uid, user_uid)
+				if(newMemberContext === undefined){
+					newMemberContext = contexts.find((context) => context.user === user_uid)
+					if(newMemberContext === undefined){
+						contexts.push({
+							"user": user_uid,
+							"channel_contexts": [{
+								"channel": channel_uid,
+						        "user_context": JSON.parse(JSON.stringify(authorContext))
+							}]
+						})
 					}
 					else{
-						channelContext.user_contexts.push({
-							"user": user_uid,
-							"user_context": JSON.parse(JSON.stringify(authorContext.user_context))
-						})
-					}				
-				}
-				this.get_relevant_user_contexts(contexts, channel_uid, author_uid).forEach((userContext) => {
-					if(userContext.user !== authorContext.user){
-						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
-						var membersDiff = userContext.user_context.members
-							.filter(member => !authorContext.user_context.members.includes(member))
-							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
-						console.log("member diff = " + membersDiff)
-						if(isAdminMatch && membersDiff.length === 1 && membersDiff[0] === user_uid && authorContext.user_context.members.includes(user_uid)){
-							userContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
-							console.log("user: " + userContext.user + " context set to: " + JSON.stringify(userContext.user_context))
-						}
+						var channelContext = newMemberContext.channel_contexts.find((channel) => channel.channel === channel_uid)
+						if(channel_contexts === undefined){
+							newMemberContext.channel_contexts.push({
+								"channel": channel_uid,
+						        "user_context": JSON.parse(JSON.stringify(authorContext))
+							})
+						}						
 					}
-				})
+				}
 			}
+			this.get_relevant_user_contexts(contexts, channel_uid, author_uid).forEach((userContext) => {
+				var isAdminMatch = userContext.admin === authorContext.admin
+				var membersDiff = userContext.members
+					.filter(member => !authorContext.members.includes(member))
+					.concat(authorContext.members.filter(member => !userContext.members.includes(member)))
+				if(isAdminMatch && membersDiff.length === 1 && membersDiff[0] === user_uid && authorContext.user_context.members.includes(user_uid)){
+					userContext = JSON.parse(JSON.stringify(authorContext))					
+				}
+			})
 		}
 		this.save_all_contexts(contexts)
 	}
