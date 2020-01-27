@@ -130,25 +130,20 @@ class ContextManagerClass {
 
 	change_admin(channel_uid, user_uid, author_uid){
 		var contexts = this.get_all_contexts()
-		var channelContext = contexts.find((context) => context.channel === channel_uid)
-		if(channelContext !== undefined){
-			var authorContext = channelContext.user_contexts.find((userContext) => userContext.user === author_uid)
-			if(authorContext !== undefined){
-				if(authorContext.user_context.members.includes(user_uid)){
-					authorContext.user_context.admin = user_uid
-				}
-				this.get_relevant_user_contexts(contexts, channel_uid, author_uid).forEach((userContext) => {
-					if(userContext.user !== authorContext.user){
-						var isAdminMatch = userContext.user_context.admin === authorContext.user_context.admin
-						var membersDiff = userContext.user_context.members
-							.filter(member => !authorContext.user_context.members.includes(member))
-							.concat(authorContext.user_context.members.filter(member => !userContext.user_context.members.includes(member)))
-						if(!isAdminMatch && membersDiff.length === 0){
-							userContext.user_context = JSON.parse(JSON.stringify(authorContext.user_context))
-						}
-					}
-				})
+		var authorContext = this.get_user_context_with_contexts_defined(contexts, channel_uid, author_uid)
+		if(authorContext !== undefined){
+			if(authorContext.members.includes(user_uid)){
+				authorContext.admin = user_uid
 			}
+			this.get_relevant_user_contexts(contexts, channel_uid, author_uid).forEach((userContext) => {
+				var isAdminMatch = userContext.admin === authorContext.admin
+				var membersDiff = userContext.members
+					.filter(member => !authorContext.members.includes(member))
+					.concat(authorContext.members.filter(member => !userContext.members.includes(member)))
+				if(!isAdminMatch && membersDiff.length === 0){
+					userContext = JSON.parse(JSON.stringify(authorContext))
+				}
+			})
 		}
 		this.save_all_contexts(contexts)
 	}
@@ -171,7 +166,7 @@ class ContextManagerClass {
 			var toReturn = []
 			authorContext.members.forEach((member) => {
 				var memberContext = this.get_user_context_with_contexts_defined(contexts, channel_uid, member)
-				if(memberContext !== undefined){
+				if(memberContext !== undefined && member !== author_uid){
 					toReturn.push(memberContext)
 				}
 			})
