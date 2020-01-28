@@ -28,7 +28,6 @@ function messageHandler(message) {
 			return message.reply("Please provide a channel name");
 		}
 		contextManager.add_channel(args[0], author.id)
-		tr.createChannel(message.guild, args[0], author)
 		return message.reply("Created channel " + args[0])
 	}
 
@@ -232,7 +231,7 @@ function messageHandler(message) {
 
 	else if (command === "reset") {
 		contextManager.save_all_contexts([])
-		tr.reset()
+		tr.reset(message.guild)
 	}
 
 	else if (command === "sync-discord-roles") {
@@ -241,11 +240,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, member.id)
-		if(!currentUserContext) {
-			return message.reply("There is currently no context for that user and role")
+		if(tr.setStatus(message.guild, member, role)){
+			return message.reply("Channel roles have been synced")
 		}
-		tr.setStatus(currentUserContext, role)
+		return message.replay("Error syncing roles")
 	}
 	
 	else {
@@ -263,7 +261,8 @@ function messageHandler(message) {
 		change-user-context-remove-member [user] [role]\n\
 		view-user-context [user] [role]\n\
 		cancel-vote\n\
-		reset\n"
+		reset\n\
+		sync-discord-roles [user] [role]\n"
 		)
 	}
 }

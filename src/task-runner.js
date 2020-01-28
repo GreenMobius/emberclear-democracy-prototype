@@ -1,18 +1,9 @@
 const config = require('../config.json');
 const Discord = require('discord.js');
+const contextManager = require("./context-manager");
 const client = new Discord.Client();
 
 class TaskRunnerClass {
-
-    createChannel(guild, channelName, member) {
-        guild.createRole({
-            name: channelName
-        }).then(() => {
-            let role = guild.roles.find(role => role.name === channelName)
-            this.addUser(member, role)
-            this.changeAdmin(member, role)
-        })        
-    }
 
     addUser(member, role) {
         member.addRole(role.id);
@@ -33,24 +24,26 @@ class TaskRunnerClass {
         member.addRole(adminRole);
     }
 
-    reset() {
-        client.guilds.forEach((guild) => {
-            console.log('clearing roles from ${guild.name}')
-            guild.roles.forEach((role) => {
-                role.delete().then(deleted => console.log('deleted role ${deleted.name}'))
-            })
+    reset(guild) {
+        console.log('clearing roles from ' + guild.name)
+        guild.roles.forEach((role) => {
+            role.delete().then(deleted => console.log('deleted role ' + deleted.name))
         })
     }
 
-    setStatus(userContext, role) {
+    setStatus(guild, member, role) {
         this.reset()
-        const guild = client.guilds.filter(guild => guild.id === config.guildId)[0]
-        const admin = guild.members.find((member) => member.id === userContext.admin)
-        this.changeAdmin(admin, role)
-        userContext.members.forEach((member) => {
-            let memberObject = guild.members.find((specificMember) => specificMember.id === member)
-            this.addUser(memberObject, role)
-        })
+        var userContext = contextManager.get_user_context(role.name, member.id)
+        if(userContext !== undefined){
+            const admin = guild.members.find((member) => member.id === userContext.admin)
+            this.changeAdmin(admin, role)
+            userContext.members.forEach((member) => {
+                let memberObject = guild.members.find((specificMember) => specificMember.id === member)
+                this.addUser(memberObject, role)
+            })
+            return true
+        }
+        return false    
     }
 }
 
