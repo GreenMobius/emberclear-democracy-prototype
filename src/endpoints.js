@@ -28,6 +28,7 @@ function messageHandler(message) {
 			return message.reply("Please provide a channel name");
 		}
 		contextManager.add_channel(args[0], author.id)
+		tr.createChannel(message.guild, args[0])
 		return message.reply("Created channel " + args[0])
 	}
 
@@ -243,7 +244,7 @@ function messageHandler(message) {
 		if(tr.setStatus(message.guild, member, role)){
 			return message.reply("Channel roles have been synced")
 		}
-		return message.replay("Error syncing roles")
+		return message.reply("Error syncing roles")
 	}
 	
 	else {
