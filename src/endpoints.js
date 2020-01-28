@@ -241,10 +241,12 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		if(tr.setStatus(message.guild, member, role)){
-			return message.reply("Channel roles have been synced")
-		}
-		return message.reply("Error syncing roles")
+		tr.setStatus(message.guild, member, role).then((success) => {
+			if(success){
+				return message.reply("Channel roles have been synced")
+			}
+			return message.reply("Error syncing roles")
+		})
 	}
 	
 	else {

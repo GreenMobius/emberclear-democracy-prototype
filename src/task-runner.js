@@ -6,17 +6,22 @@ const client = new Discord.Client();
 class TaskRunnerClass {
 
     createChannel(guild, roleName) {
-        return guild.createRole({
+        var promises = []
+        promises.push(guild.createRole({
             name: roleName
-        })
+        }))
+        promises.push(guild.createRole({
+            name: "admin-" + roleName
+        }))
+        return Promise.allSettled(promises)
     }
 
     addUser(member, role) {
-        return member.addRole(role.id);
+        return member.addRole(role.id)
     }
     
     removeUser(member, role) {
-        return member.removeRole(role);
+        return member.removeRole(role)
     }
     
     changeAdmin(guild, member, role) {
@@ -43,7 +48,7 @@ class TaskRunnerClass {
     }
 
     setStatus(guild, member, role) {
-        this.reset(guild).then(() => {
+        return this.reset(guild).then(() => {
             this.createChannel(guild, role.name).then(() => {
                 var userContext = contextManager.get_user_context(role.name, member.id)
                 if(userContext !== undefined){
