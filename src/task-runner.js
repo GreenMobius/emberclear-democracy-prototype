@@ -20,12 +20,16 @@ class TaskRunnerClass {
     }
     
     changeAdmin(guild, member, role) {
-        const currentAdmin = guild.members.filter(member => member.roles.includes(role))[0];
+        const currentAdmin = guild.members.filter(member => member.roles.find(memberRole => memberRole === role) !== undefined)[0]
         var promises = []
-        if(currentAdmin) {
-            promises.push(currentAdmin.removeRole(adminRole))
+        var adminRoleName = "admin-" + role.name
+        var adminRole = guild.roles.find((guildRole) => guildRole.name === adminRoleName)
+        if(adminRole !== undefined){
+            if(currentAdmin) {
+                promises.push(currentAdmin.removeRole(adminRole))
+            }
+            promises.push(member.addRole(adminRole))
         }
-        promises.push(member.addRole(adminRole))
         return Promise.allSettled(promises)
     }
 
