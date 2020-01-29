@@ -3,6 +3,9 @@ const tr = require("./task-runner");
 const democracy = require("./democracy");
 const contextManager = require("./context-manager");
 
+const positiveResponses = [ "yes", "y", "no'nt", "yea", "sure"]
+const negativeResponses = [ "no", "n", "yesn't", "nay"]
+
 var voteInProgress = false;
 var state = null;
 
@@ -93,50 +96,33 @@ function messageHandler(message) {
 	}
 
 	else if (command === "vote") {
+		let actor = author
+		let member = message.mentions.members.first()
+		if(member) {
+			actor = member
+		}
 		if(!voteInProgress) {
 			return message.reply("There are no votes in progress.")
 		}
 		let role = message.guild.roles.find(role => role.name === state.channel.chid)
 		let channel = {
 			"chid": role.name,
-			"members": contextManager.get_user_context(role.name, author.id).members,
-			"admin": contextManager.get_user_context(role.name, author.id).admin
+			"members": contextManager.get_user_context(role.name, actor.id).members,
+			"admin": contextManager.get_user_context(role.name, actor.id).admin
 		}
 
 		// invoke democracy vote
 		var response = args[0]
 		var vote;
-		switch(response) {
-			case "yes":
-			case "yea":
-			case "y":
-			case "aye":
-			case "ay":
-			case "no'nt":
-			case "Yes":
-			case "Yea":
-			case "Y":
-			case "Aye":
-			case "Ay":
-			case "No'nt":
-				vote = true
-				break
-			case "no":
-			case "nay":
-			case "n":
-			case "nah":
-			case "yesn't":
-			case "No":
-			case "Nay":
-			case "N":
-			case "Nah":
-			case "Yesn't":
-			default:
-				vote = false
-				break
+		if(positiveResponses.contains(response)) {
+			vote = true
+		} else if (negativeResponses.contains(response)) {
+			vote = false
+		} else {
+			return message.reply("Please vote yes or no.")
 		}
 
-		state = democracy.vote(message.author, state, vote)
+		state = democracy.vote(actor, state, vote)
 
 		if(state.error) {
 			return message.reply("Error during voting: " + state.error)
@@ -149,21 +135,22 @@ function messageHandler(message) {
 			voteInProgress = false
 			switch(state.action) {
 				case "add":
-					contextManager.add_user(channel.chid, state.target.id, author.id)
+					contextManager.add_user(channel.chid, state.target.id, actor.id)
 					tr.addUser(state.target, role)
 					return message.reply("Vote has passed, adding user " + state.target)
 				case "remove":
-					contextManager.delete_user(channel.chid, state.target.id, author.id)
+					contextManager.delete_user(channel.chid, state.target.id, actor.id)
 					tr.removeUser(state.target, role)
 					return message.reply("Vote has passed, removing user " + state.target)
 				case "promote":
-					contextManager.change_admin(channel.chid, state.target.id, author.id)
+					contextManager.change_admin(channel.chid, state.target.id, actor.id)
 					tr.changeAdmin(state.target, role)
 					return message.reply("Vote has passed, promoting user " + state.target)
 				default:
 					return message.reply("Vote has passed, but there was no action?")
 			}
 		}
+
 		// if fail, announce fail
 		if(state.nay.length > state.yea.length + state.remain.length) {
 			voteInProgress = false
@@ -177,10 +164,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		currentUserContext.admin = member.id
-		contextManager.change_users_user_context(role.name, author.id, currentUserContext)
-		return message.reply("Successfully changed admin to " + member.id)
+		if(contextManager.change_users_user_context_change_admin(role.name, member.id, author.id)){
+			return message.reply("Successfully changed admin to user " + member.id)
+		}
+		return message.reply("Encountered error changing admin to user " + member.id)
 	}
 
 	else if (command === "change-user-context-add-member") {
@@ -189,12 +176,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		if(currentUserContext.members.find((contextMember) => contextMember === member.id) === undefined) {
-			currentUserContext.members.push(member.id)
-			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		if(contextManager.change_users_user_context_add_member(role.name, member.id, author.id)){
 			return message.reply("Successfully added user " + member.id)
-		}		
+		}
+		return message.reply("Encountered error adding user " + member.id)
 	}
 
 	else if (command === "change-user-context-remove-member") {
@@ -203,13 +188,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		if(currentUserContext.members.find((contextMember) => contextMember === member.id) !== undefined){
-			var index = currentUserContext.members.findIndex((contextMember) => contextMember === member.id)
-			currentUserContext.members.splice(index, 1)
-			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		if(contextManager.change_users_user_context_remove_member(role.name, member.id, author.id)){
 			return message.reply("Successfully removed user " + member.id)
 		}
+		return message.reply("Encountered error removing user " + member.id)
 	}
 
 	else if (command === "view-user-context") {
@@ -228,6 +210,7 @@ function messageHandler(message) {
 	else if (command === "cancel-vote") {
 		state = null;
 		voteInProgress = false;
+		return message.reply("Vote cancelled.")
 	}
 
 	else if (command === "reset") {
@@ -258,7 +241,6 @@ function messageHandler(message) {
 		remove-member [user] [role]\n\
 		change-admin [user] [role]\n\
 		vote [yes/no]\n\
-		create-channel [role]\n\
 		change-user-context-admin [user] [role]\n\
 		change-user-context-add-member [user] [role]\n\
 		change-user-context-remove-member [user] [role]\n\
