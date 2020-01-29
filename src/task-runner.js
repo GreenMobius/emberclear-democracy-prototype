@@ -7,17 +7,18 @@ class TaskRunnerClass {
 
     createChannel(guild, roleName) {
         var promises = []
+        var newRole = undefined
         promises.push(guild.createRole({
             name: roleName
-        }))
+        }).then(role => newRole = role))
         promises.push(guild.createRole({
             name: "admin-" + roleName
         }))
-        return Promise.allSettled(promises)
+        return Promise.allSettled(promises).then(() => newRole)
     }
 
     addUser(member, role) {
-        return member.addRole(role.id)
+        return member.addRole(role)
     }
     
     removeUser(member, role) {
@@ -49,18 +50,19 @@ class TaskRunnerClass {
 
     setStatus(guild, member, role) {
         return this.reset(guild).then(() => {
-            this.createChannel(guild, role.name).then(() => {
-                var userContext = contextManager.get_user_context(role.name, member.id)
+            this.createChannel(guild, role.name).then(newRole => {
+                var userContext = contextManager.get_user_context(newRole.name, member.id)
                 if(userContext !== undefined){
                     const admin = guild.members.find((member) => member.id === userContext.admin)
-                    this.changeAdmin(guild, admin, role)
+                    var promises = []
+                    promises.push(this.changeAdmin(guild, admin, newRole))
                     userContext.members.forEach((member) => {
                         let memberObject = guild.members.find((specificMember) => specificMember.id === member)
-                        this.addUser(memberObject, role)
+                        promises.push(this.addUser(memberObject, newRole))
                     }) 
-                    return true
+                    return Promise.allSettled(promises).then(() => true)
                 }
-                return false
+                return Promise.resolve(false)
             })
         })
     }
