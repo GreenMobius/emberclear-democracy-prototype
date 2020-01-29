@@ -27,11 +27,12 @@ function messageHandler(message) {
 	}
 
 	else if (command === "create-channel") {
-		let role = message.guild.roles.find(role => role.name === args[0])
-		contextManager.add_channel(role.name, author.id)
-		tr.addUser(author, role)
-		tr.changeAdmin(author, role)
-		return message.reply("Created channel " + arg[0])
+		if(args[0] === undefined){
+			return message.reply("Please provide a channel name");
+		}
+		contextManager.add_channel(args[0], author.id)
+		tr.createChannel(message.guild, args[0])
+		return message.reply("Created channel " + args[0])
 	}
 
 	else if (command === "add-member") {
@@ -214,6 +215,21 @@ function messageHandler(message) {
 
 	else if (command === "reset") {
 		contextManager.save_all_contexts([])
+		tr.reset(message.guild)
+	}
+
+	else if (command === "sync-discord-roles") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		let role = message.guild.roles.find(role => role.name === args[1])
+		if (!role) {
+			return message.reply("The role does not exist or no role was provided")
+		}
+		tr.setStatus(message.guild, member, role).then((success) => {
+			if(success){
+				return message.reply("Channel roles have been synced")
+			}
+			return message.reply("Error syncing roles")
+		})
 	}
 	
 	else {
@@ -230,7 +246,8 @@ function messageHandler(message) {
 		change-user-context-remove-member [user] [role]\n\
 		view-user-context [user] [role]\n\
 		cancel-vote\n\
-		reset\n"
+		reset\n\
+		sync-discord-roles [user] [role]\n"
 		)
 	}
 }

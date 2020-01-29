@@ -79,3 +79,8 @@ Cancel the vote currently in progress
 ?reset
 ```
 Resets all data
+
+```
+?sync-discord-roles [member] [channel]
+```
+Syncs the discord roles with a given user's context
