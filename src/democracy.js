@@ -34,8 +34,11 @@ let Democracy = {
 	// uid: user id, channel: channel (chid, members)
 	addUser: function (sender, target, channel) {
 		console.log("Voting to add user " + target + " to channel " + channel.chid + " with members: " + channel.members);
-		//TODO: stop if sender is not in channel
-		//TODO: stop if target is already in channel
+		if(channel.members.includes(target)) {
+			return {
+				"error" : "User " + target + " is already in channel" + channel.chid
+			}
+		}
 		return this.makeEmptyState(target, channel, "add");
 	},
 
@@ -43,8 +46,11 @@ let Democracy = {
 	// uid: user id, channel: channel (chid, members)
 	removeUser: function (sender, target, channel) {
 		console.log("Voting to remove user " + target + " from channel " + channel.chid);
-		//TODO: stop if sender is not in channel
-		//TODO: stop if target is not in channel
+		if(!channel.members.includes(target)) {
+			return {
+				"error" : "User " + target + " is not in channel" + channel.chid
+			}
+		}
 		return this.makeEmptyState(target, channel, "remove");
 	},
 
@@ -52,8 +58,11 @@ let Democracy = {
 	// uid: user id, channel: channel (chid, members)
 	promoteUser: function (sender, target, channel) {
 		console.log("Voting to promote user " + target + " in channel " + channel.chid);
-		//TODO: stop if sender is not in channel
-		//TODO: stop if target is already in channel
+		if(!channel.members.includes(target)) {
+			return {
+				"error" : "User " + target + " is not in channel" + channel.chid
+			}
+		}
 		return this.makeEmptyState(target, channel, "promote");
 	},
 
@@ -77,9 +86,6 @@ let Democracy = {
 	// sender: author of vote, prevState: state object, vote: boolean
 	vote: function (sender, prevState, vote) {
 		console.log("vote is " + vote)
-		// TODO: implement hashing previous state
-		// TODO: encrypt message with user's private key
-		// TODO: add validation logic for previous states
 		if(!prevState.remain.includes(sender.id)) {
 			return {
 				"error": "Vote is invalid. " + sender.id + " is not in the list " + prevState.remain
@@ -93,7 +99,28 @@ let Democracy = {
 			state.nay.push(sender)
 		}
 		return state;
-		}
+	},
+
+	// verifies that the chain of voting makes sense
+	// return true if it should be accepted as a valid vote
+	// issues addressed here: 
+	// - multiple votes added at once
+	// - made up votes
+	// - members added or missing from vote
+	// - vote prematurely decided
+	verifyVoteChain: function (vote) {
+		//TODO: implement
+	},
+
+	// verifies that the chain of channel contexts makes sense
+	// return true if it should be accepted as a valid context
+	// issues addressed here:
+	// - context changes include more than one change
+	// - a change isn't backed up by a vote chain
+	// - channel starts with more than one member
+	verifyContextChain: function (contextChain) {
+		//TODO: implement
 	}
+}
 
 module.exports = Democracy;
