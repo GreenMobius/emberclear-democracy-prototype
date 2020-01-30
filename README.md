@@ -21,6 +21,11 @@ Channels and channel administrator memberships are represented using Discord rol
 Bot will provide its status. 'OK' means functional.
 
 ```
+?state
+```
+Display the state of the vote
+
+```
 ?create-channel
 ```
 Create a channel with you as the only member and as the admin
@@ -64,3 +69,18 @@ Change your user context to set a user as the admin of your version of a channel
 ?view-user-context [member] [channel]
 ```
 View a given user's context for a given channel
+
+```
+?cancel-vote
+```
+Cancel the vote currently in progress
+
+```
+?reset
+```
+Resets all data
+
+```
+?sync-discord-roles [member] [channel]
+```
+Syncs the discord roles with a given user's context

@@ -17,7 +17,8 @@ const commands = [ 	"(t) test",
 					"(uca) change-user-context-add-user [user] [role]",
 					"(ucr) change-user-context-remove-user [user] [role]",
 					"(ucv) view-user-context [user] [role]",
-					"(d) discord-sync"
+					"(rs) reset",
+					"(d) sync-discord-roles [user] [role]"
 				]
 
 var voteInProgress = false;
@@ -41,11 +42,12 @@ function messageHandler(message) {
 	}
 
 	else if (command === "create-channel" || command === "c") {
-		let role = message.guild.roles.find(role => role.name === args[0])
-		contextManager.add_channel(role.name, author.id)
-		tr.addUser(author, role)
-		tr.changeAdmin(author, role)
-		return message.reply("Created channel " + arg[0])
+		if(args[0] === undefined){
+			return message.reply("Please provide a channel name");
+		}
+		contextManager.add_channel(args[0], author.id)
+		tr.createChannel(message.guild, args[0])
+		return message.reply("Created channel " + args[0])
 	}
 
 	else if (command === "add-member" || command === "a") {
@@ -177,10 +179,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		currentUserContext.admin = member.id
-		contextManager.change_users_user_context(role.name, author.id, currentUserContext)
-		return message.reply("Successfully changed admin to " + member.id)
+		if(contextManager.change_users_user_context_change_admin(role.name, member.id, author.id)){
+			return message.reply("Successfully changed admin to user " + member.id)
+		}
+		return message.reply("Encountered error changing admin to user " + member.id)
 	}
 
 	else if (command === "change-user-context-add-member" || command === "uca") {
@@ -189,12 +191,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		if(currentUserContext.members.find((contextMember) => contextMember === member.id) === undefined) {
-			currentUserContext.members.push(member.id)
-			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		if(contextManager.change_users_user_context_add_member(role.name, member.id, author.id)){
 			return message.reply("Successfully added user " + member.id)
-		}		
+		}
+		return message.reply("Encountered error adding user " + member.id)
 	}
 
 	else if (command === "change-user-context-remove-member" || command === "ucr") {
@@ -203,13 +203,10 @@ function messageHandler(message) {
 		if (!role) {
 			return message.reply("The role does not exist or no role was provided")
 		}
-		let currentUserContext = contextManager.get_user_context(role.name, author.id)
-		if(currentUserContext.members.find((contextMember) => contextMember === member.id) !== undefined){
-			var index = currentUserContext.members.findIndex((contextMember) => contextMember === member.id)
-			currentUserContext.members.splice(index, 1)
-			contextManager.change_users_user_context(role.name, author.id, currentUserContext)
+		if(contextManager.change_users_user_context_remove_member(role.name, member.id, author.id)){
 			return message.reply("Successfully removed user " + member.id)
 		}
+		return message.reply("Encountered error removing user " + member.id)
 	}
 
 	else if (command === "view-user-context" || command === "ucv") {
@@ -230,24 +227,30 @@ function messageHandler(message) {
 		voteInProgress = false;
 		return message.reply("Vote cancelled.")
 	}
+
+	else if (command === "reset" || command === "rs") {
+		contextManager.save_all_contexts([])
+		tr.reset(message.guild)
+	}
+
+	else if (command === "sync-discord-roles" || command === "d") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		let role = message.guild.roles.find(role => role.name === args[1])
+		if (!role) {
+			return message.reply("The role does not exist or no role was provided")
+		}
+		tr.setStatus(message.guild, member, role).then((success) => {
+			if(success){
+				return message.reply("Channel roles have been synced")
+			}
+			return message.reply("Error syncing roles")
+		})
+	}
 	
 	else {
 		var helpString = "Available commands:\n"
 		commands.forEach((singleCmd) => helpString = helpString + singleCmd + "\n")
 		return message.reply(helpString)
-		/*return message.reply("Available commands: \n\
-		test \n\
-		state \n\
-		add-member [user] [role]\n\
-		remove-member [user] [role]\n\
-		change-admin [user] [role]\n\
-		vote [yes/no]\n\
-		create-channel [role]\n\
-		change-user-context-admin [user] [role]\n\
-		change-user-context-add-user [user] [role]\n\
-		change-user-context-remove-user [user] [role]\n\
-		view-user-context [user] [role]\n"
-		)*/
 	}
 }
 
