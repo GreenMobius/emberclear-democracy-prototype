@@ -18,7 +18,8 @@ const commands = [ 	"(t) test",
 					"(ucr) change-user-context-remove-user [user] [role]",
 					"(ucv) view-user-context [user] [role]",
 					"(rs) reset",
-					"(d) sync-discord-roles [user] [role]"
+					"(d) sync-discord-roles [user] [role]",
+					"(u) upload-user-context [user] [context]"
 				]
 
 var voteInProgress = false;
@@ -245,6 +246,17 @@ function messageHandler(message) {
 			}
 			return message.reply("Error syncing roles")
 		})
+	}
+
+	else if (command === "upload-user-context" || command === "u") {
+		let member = message.mentions.members.first() || message.guild.members.get(args[0])
+		var raw_context_array = args
+		raw_context_array.shift()
+		var context_string = ""
+		raw_context_array.forEach((item) => context_string = context_string + item + " ")
+		var context = JSON.parse(context_string)
+		console.log(JSON.stringify(context, null, 2))
+		contextManager.change_complete_user_context(member.id, context)
 	}
 	
 	else {

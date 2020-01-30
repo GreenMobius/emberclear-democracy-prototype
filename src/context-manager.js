@@ -216,6 +216,16 @@ class ContextManagerClass {
 		return undefined
 	}
 
+	change_complete_user_context(user_uid, user_context) {
+		var contexts = this.get_all_contexts()
+		var userContext = contexts.find((context) => context.user === user_uid)
+		if(userContext !== undefined) {
+			userContext = undefined
+		}
+		contexts.push(user_context)
+		this.save_all_contexts()
+	}
+
 }
 
 const ContextManager = new ContextManagerClass()
