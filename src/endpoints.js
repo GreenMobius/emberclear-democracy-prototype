@@ -146,7 +146,7 @@ function messageHandler(message) {
 		message.reply("Vote counted. There are now " + state.yea.length + " votes for, and " + state.nay.length + " votes against. " + state.remain.length + " votes remain.")
 
 		// if pass, execute command
-		if(state.yea.length > state.nay.length + state.remain.length) {
+		if(democracy.isVotePassing(state, null, channel.admin)) {
 			voteInProgress = false
 			switch(state.action) {
 				case "add":
@@ -167,10 +167,12 @@ function messageHandler(message) {
 		}
 
 		// if fail, announce fail
-		if(state.nay.length > state.yea.length + state.remain.length) {
+		else if(democracy.isVotePassing(state, null, channel.admin)) {
 			voteInProgress = false
 			return message.reply("Vote has failed. Nothing changes.")
 		}
+
+		// otherwise, no further action is taken
 	}
 
 	else if (command === "change-user-context-admin"  || command === "ucp") {
