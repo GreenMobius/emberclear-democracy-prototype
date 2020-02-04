@@ -103,22 +103,7 @@ let Democracy = {
 
 	// verifies that the chain of voting makes sense
 	// return true if it should be accepted as a valid vote
-	// issues addressed here: 
-	// - multiple votes added at once
-	// - made up votes
-	// - members added or missing from vote
-	// - vote prematurely decided
 	verifyVoteChain: function (vote) {
-		//TODO: implement
-	},
-
-	// verifies that the chain of channel contexts makes sense
-	// return true if it should be accepted as a valid context
-	// issues addressed here:
-	// - context changes include more than one change
-	// - a change isn't backed up by a vote chain
-	// - channel starts with more than one member
-	verifyContextChain: function (contextChain) {
 		//TODO: implement
 	}
 }
