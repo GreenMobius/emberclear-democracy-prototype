@@ -2,14 +2,15 @@ let Democracy = {
 
 	/* 
 	voteState = {
-		chid : <target channel id>,
+		channel : <target channel id>,
 		action: <add|remove|promote>,
 		target : <target user id>,
-		yea : [ <uid1>, <uid2> ],
-		nay : [ <uid3> ],
-		remain : [ <uid4>, <uid5> ],
+		yea : [ <uid> ],
+		nay : [ <uid> ],
+		remain : [ <uid> ],
 		time : <timestamp>,
 		previous : <link to previous state>,
+		key: <uid of last voter>,
 		error: <error, null if none>
 	}
 	*/
@@ -26,6 +27,7 @@ let Democracy = {
 			"remain" : channel.members,
 			"time" : new Date(),
 			"previous" : null,
+			"key" : null,
 			"error" : null
 		}
 	},
@@ -78,6 +80,7 @@ let Democracy = {
 			"remain" : state.remain,
 			"time" : new Date(),
 			"previous" : state,
+			"key" : vote.previous.remain.filter((member) => !vote.remain.includes(member)),
 			"error" : null
 		}
 	},
@@ -98,13 +101,37 @@ let Democracy = {
 		} else {
 			state.nay.push(sender)
 		}
-		return state;
+		return state
+	},
+
+	isVotePassing: function (vote, user, admin) {
+		return vote.yea.length > vote.nay.length + vote.remain.length
+			|| (vote.yea.length === vote.nay.length + vote.remain.length
+				&& vote.yea.includes(admin))
+	},
+
+	isVoteFailing: function (vote, user, admin) {
+		return vote.nay.length > vote.yea.length + vote.remain.length
+			|| (vote.nay.length === vote.yea.length + vote.remain.length
+				&& vote.nay.includes(admin))
 	},
 
 	// verifies that the chain of voting makes sense
 	// return true if it should be accepted as a valid vote
-	verifyVoteChain: function (vote) {
-		//TODO: implement
+	verifyVoteChain: function (vote, user, members) {
+		//starts with empty vote
+		if(vote.previous === null) {
+			return vote.yea.length === 0 &&
+				vote.nay.length === 0 &&
+				vote.remain.length === members.length &&
+				vote.remain.filter((member) => !members.includes(member)).length === 0
+		}
+		//members are consistent
+		var completeMemberList = vote.yea + vote.nay + vote.remain
+
+		//user's vote changes from previous
+
+		return verifyVoteChain(vote.previous, vote.key)
 	}
 }
 
