@@ -127,7 +127,6 @@ let Democracy = {
 				vote.remain.filter((member) => !members.includes(member)).length === 0
 		}
 		//members are consistent
-		var completeMemberList = vote.yea + vote.nay + vote.remain
 
 		//user's vote changes from previous
 
