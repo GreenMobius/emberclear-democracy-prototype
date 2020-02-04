@@ -119,18 +119,41 @@ let Democracy = {
 	// verifies that the chain of voting makes sense
 	// return true if it should be accepted as a valid vote
 	verifyVoteChain: function (vote, user, members) {
-		//starts with empty vote
-		if(vote.previous === null) {
-			return vote.yea.length === 0 &&
-				vote.nay.length === 0 &&
-				vote.remain.length === members.length &&
-				vote.remain.filter((member) => !members.includes(member)).length === 0
+		try {
+			//starts with empty vote
+			if(vote.previous === null) {
+				var result = vote.yea.length === 0 &&
+					vote.nay.length === 0 &&
+					vote.remain.length === members.length &&
+					vote.remain.filter((member) => !members.includes(member)).length === 0
+				console.log(result ? "vote chain is valid" : "not an empty base!")
+				return result
+			}
+			//members are consistent
+			var completeMemberList = vote.yea + vote.nay + vote.remain
+			if(completeMemberList.length !== members.length || 
+				completeMemberList.filter((member) => !members.includes(member)).length) {
+				console.log("members are inconsistent!")
+				return false
+			}
+			//user's vote changes from previous
+			if(!((itemIsOnlyDiff(vote.yea, vote.previous.yea, user) ||
+				itemIsOnlyDiff(vote.nay, vote.previous.nay, user)) &&
+				itemIsOnlyDiff(vote.previous.remain, vote.remain, user))) {
+				console.log("more than one vote changed!")
+				return false
+			}
+			return verifyVoteChain(vote.previous, vote.key)
+		} catch(error) {
+			console.log("error checking vote chain")
+			return false
 		}
-		//members are consistent
+	},
 
-		//user's vote changes from previous
-
-		return verifyVoteChain(vote.previous, vote.key)
+	itemIsOnlyDiff: function (longList, shortList, item) {
+		longList.length === shortList.length + 1 &&
+		longList.filter((member) => !shortList.includes(member)).length === 1 &&
+		longList.filter((member) => !shortList.includes(member)).includes(item)
 	}
 }
 
